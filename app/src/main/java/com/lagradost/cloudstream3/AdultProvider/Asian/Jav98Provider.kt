@@ -90,8 +90,8 @@ class Jav98Provider : MainAPI() {
         val titleEl = doc.selectFirst("title")
         val title = titleEl?.text()?.replace(" - JAV98", "") ?: url.split("/").last()
         
-        val imgEl = doc.selectFirst("img[src*=/work/]")
-        val posterUrl = imgEl?.attr("src")
+        val imgEl = doc.selectFirst("#cover-img, img[data-src*=/work/], img[src*=/work/]")
+        val posterUrl = imgEl?.attr("data-src")?.takeIf { it.isNotEmpty() } ?: imgEl?.attr("src")
         
         val tags = doc.select(".tag").map { it.text().trim() }.filter { it.isNotEmpty() && !it.contains("GB") }
         
@@ -126,7 +126,7 @@ class Jav98Provider : MainAPI() {
             val nameText = match.groupValues[3].trim()
             val name = "$nameText ($size)"
             
-            magnetUrl = magnetUrl.replace("&amp;", "&")
+            magnetUrl = magnetUrl.replace("&amp;amp;", "&").replace("&amp;", "&")
             
             callback.invoke(
                 ExtractorLink(source = this.name, name = name, url = magnetUrl, referer = "", quality = 0, type = com.lagradost.cloudstream3.utils.ExtractorLinkType.VIDEO)
