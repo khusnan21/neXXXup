@@ -105,7 +105,7 @@ class Jav98Provider : MainAPI() {
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = posterUrl
             this.tags = tags
-            this.actors = actors.map { com.unan.nexxxup.ActorData(Actor = it) }
+            this.actors = actors.map { com.unan.nexxxup.ActorData(actor = it) }
         }
     }
 

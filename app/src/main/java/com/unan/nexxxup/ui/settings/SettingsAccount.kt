@@ -17,7 +17,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import androidx.recyclerview.widget.RecyclerView
-import com.unan.nexxxup.CloudStreamApp.Companion.openBrowser
+import com.unan.nexxxup.NexxxupApp.Companion.openBrowser
 import com.unan.nexxxup.CommonActivity.onDialogDismissedEvent
 import com.unan.nexxxup.CommonActivity.showToast
 import com.unan.nexxxup.ErrorLoadingException

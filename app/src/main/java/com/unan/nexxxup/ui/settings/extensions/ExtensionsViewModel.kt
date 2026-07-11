@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.unan.nexxxup.CloudStreamApp.Companion.getKey
+import com.unan.nexxxup.NexxxupApp.Companion.getKey
 import com.unan.nexxxup.R
 import com.unan.nexxxup.amap
 import com.unan.nexxxup.mvvm.debugAssert

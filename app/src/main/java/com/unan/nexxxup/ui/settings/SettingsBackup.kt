@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.unan.nexxxup.CloudStreamApp
+import com.unan.nexxxup.NexxxupApp
 import com.unan.nexxxup.R
 import com.unan.nexxxup.services.BackupWorkManager
 import com.unan.nexxxup.ui.BasePreferenceFragmentCompat
@@ -38,7 +38,7 @@ class SettingsBackup : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout.
     }
 
     private val pathPicker = getChooseFolderLauncher { uri, path ->
-        val context = context ?: CloudStreamApp.context ?: return@getChooseFolderLauncher
+        val context = context ?: NexxxupApp.context ?: return@getChooseFolderLauncher
         (path ?: uri.toString()).let {
             PreferenceManager.getDefaultSharedPreferences(context).edit {
                 putString(getString(R.string.backup_path_key), uri.toString())
@@ -74,7 +74,7 @@ class SettingsBackup : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout.
                     putInt(getString(R.string.automatic_backup_key), prefValues[index])
                 }
                 BackupWorkManager.enqueuePeriodicWork(
-                    context ?: CloudStreamApp.context,
+                    context ?: NexxxupApp.context,
                     prefValues[index].toLong()
                 )
             }

@@ -61,7 +61,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
             val failedList = java.util.Collections.synchronizedList(mutableListOf<Pair<String, String>>())
             
             uris.amap { uri ->
-                val fileName = com.unan.safefile.SafeFile.fromUri(context, uri)?.name() ?: "plugin.cs3"
+                val fileName = com.lagradost.safefile.SafeFile.fromUri(context, uri)?.name() ?: "plugin.cs3"
                 try {
                     val inputStream = context.contentResolver.openInputStream(uri)
                     if (inputStream == null) {
@@ -136,7 +136,7 @@ class ExtensionsFragment : BaseFragment<FragmentExtensionsBinding>(
             val failedList = java.util.Collections.synchronizedList(mutableListOf<Pair<String, String>>())
             
             uris.amap { uri ->
-                val fileName = com.unan.safefile.SafeFile.fromUri(context, uri)?.name() ?: "plugin.nex"
+                val fileName = com.lagradost.safefile.SafeFile.fromUri(context, uri)?.name() ?: "plugin.nex"
                 try {
                     val inputStream = context.contentResolver.openInputStream(uri)
                     if (inputStream == null) {

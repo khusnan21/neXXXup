@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.viewbinding.ViewBinding
-import com.unan.nexxxup.CloudStreamApp.Companion.getActivity
+import com.unan.nexxxup.NexxxupApp.Companion.getActivity
 import com.unan.nexxxup.PROVIDER_STATUS_DOWN
 import com.unan.nexxxup.R
 import com.unan.nexxxup.TvType

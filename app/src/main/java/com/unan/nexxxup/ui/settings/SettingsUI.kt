@@ -6,7 +6,7 @@ import android.view.View
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.preference.SeekBarPreference
-import com.unan.nexxxup.CloudStreamApp.Companion.getActivity
+import com.unan.nexxxup.NexxxupApp.Companion.getActivity
 import com.unan.nexxxup.MainActivity
 import com.unan.nexxxup.R
 import com.unan.nexxxup.SearchQuality

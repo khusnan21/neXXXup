@@ -126,12 +126,10 @@ class Jav141Provider : MainAPI() {
                 if (linkName.isEmpty()) linkName = "Magnet"
                 callback.invoke(
                     newExtractorLink(
-                        name,
-                        linkName,
-                        href,
-                        "",
-                        0,
-                        false
+                        source = name,
+                        name = linkName,
+                        url = href,
+                        type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO
                     )
                 )
             } else if (href.lowercase().endsWith(".torrent")) {

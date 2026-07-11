@@ -17,9 +17,9 @@ import androidx.preference.PreferenceManager
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.unan.nexxxup.APIHolder.allProviders
-import com.unan.nexxxup.CloudStreamApp
-import com.unan.nexxxup.CloudStreamApp.Companion.getKey
-import com.unan.nexxxup.CloudStreamApp.Companion.setKey
+import com.unan.nexxxup.NexxxupApp
+import com.unan.nexxxup.NexxxupApp.Companion.getKey
+import com.unan.nexxxup.NexxxupApp.Companion.setKey
 import com.unan.nexxxup.CommonActivity.showToast
 import com.unan.nexxxup.MainActivity
 import com.unan.nexxxup.R
@@ -77,7 +77,7 @@ class SettingsGeneral : Fragment() {
     )
 
     private val pathPicker = getChooseFolderLauncher { uri, path ->
-        val context = context ?: CloudStreamApp.context ?: return@getChooseFolderLauncher
+        val context = context ?: NexxxupApp.context ?: return@getChooseFolderLauncher
         (path ?: uri.toString()).let {
             PreferenceManager.getDefaultSharedPreferences(context).edit {
                 putString(getString(R.string.download_path_key), uri.toString())
@@ -210,7 +210,7 @@ class SettingsGeneral : Fragment() {
                 {}) { selectedIdx ->
                 settingsManager.edit { putInt(getString(R.string.dns_pref), prefValues[selectedIdx]) }
                 dnsDesc?.text = prefNames[selectedIdx]
-                (context ?: CloudStreamApp.context)?.let { ctx -> app.initClient(ctx) }
+                (context ?: NexxxupApp.context)?.let { ctx -> app.initClient(ctx) }
             }
         }
 
