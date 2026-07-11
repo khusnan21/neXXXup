@@ -1,0 +1,697 @@
+package com.unan.nexxxup.ui.search
+
+import android.app.Activity
+import android.content.Intent
+import android.content.DialogInterface
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.AbsListView
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
+import androidx.preference.PreferenceManager
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.unan.nexxxup.APIHolder.getApiFromNameNull
+import com.unan.nexxxup.AllLanguagesName
+import com.unan.nexxxup.AnimeSearchResponse
+import com.unan.nexxxup.NexxxupApp.Companion.removeKey
+import com.unan.nexxxup.NexxxupApp.Companion.removeKeys
+import com.unan.nexxxup.CommonActivity.showToast
+import com.unan.nexxxup.HomePageList
+import com.unan.nexxxup.MainAPI
+import com.unan.nexxxup.MainActivity
+import com.unan.nexxxup.MainActivity.Companion.afterPluginsLoadedEvent
+import com.unan.nexxxup.R
+import com.unan.nexxxup.SearchResponse
+import com.unan.nexxxup.TvType
+import com.unan.nexxxup.databinding.FragmentSearchBinding
+import com.unan.nexxxup.databinding.HomeSelectMainpageBinding
+import com.unan.nexxxup.mvvm.Resource
+import com.unan.nexxxup.mvvm.logError
+import com.unan.nexxxup.mvvm.observe
+import com.unan.nexxxup.ui.APIRepository
+import com.unan.nexxxup.ui.BaseAdapter
+import com.unan.nexxxup.ui.BaseFragment
+import com.unan.nexxxup.ui.home.HomeFragment
+import com.unan.nexxxup.ui.home.HomeFragment.Companion.bindChips
+import com.unan.nexxxup.ui.home.HomeFragment.Companion.currentSpan
+import com.unan.nexxxup.ui.home.HomeFragment.Companion.loadHomepageList
+import com.unan.nexxxup.ui.home.HomeFragment.Companion.updateChips
+import com.unan.nexxxup.ui.home.HomeViewModel
+import com.unan.nexxxup.ui.home.ParentItemAdapter
+import com.unan.nexxxup.ui.quicksearch.QuickSearchFragment
+import com.unan.nexxxup.ui.result.FOCUS_SELF
+import com.unan.nexxxup.ui.result.setLinearListLayout
+import com.unan.nexxxup.ui.setRecycledViewPool
+import com.unan.nexxxup.ui.settings.Globals.PHONE
+import com.unan.nexxxup.ui.settings.Globals.isLandscape
+import com.unan.nexxxup.ui.settings.Globals.isLayout
+import com.unan.nexxxup.utils.AppContextUtils.filterProviderByPreferredMedia
+import com.unan.nexxxup.utils.AppContextUtils.filterSearchResultByFilmQuality
+import com.unan.nexxxup.utils.AppContextUtils.getApiProviderLangSettings
+import com.unan.nexxxup.utils.AppContextUtils.getCustomAdultTypes
+import com.unan.nexxxup.utils.AppContextUtils.getApiSettings
+import com.unan.nexxxup.utils.AppContextUtils.ownHide
+import com.unan.nexxxup.utils.AppContextUtils.ownShow
+import com.unan.nexxxup.utils.AppContextUtils.setDefaultFocus
+import com.unan.nexxxup.utils.Coroutines.ioSafe
+import com.unan.nexxxup.utils.Coroutines.main
+import com.unan.nexxxup.utils.DataStoreHelper
+import com.unan.nexxxup.utils.DataStoreHelper.currentAccount
+import com.unan.nexxxup.utils.SubtitleHelper
+import com.unan.nexxxup.utils.BackPressedCallbackHelper.attachBackPressedCallback
+import com.unan.nexxxup.utils.BackPressedCallbackHelper.detachBackPressedCallback
+import com.unan.nexxxup.utils.UIHelper.dismissSafe
+import com.unan.nexxxup.utils.UIHelper.fixSystemBarsPadding
+import com.unan.nexxxup.utils.UIHelper.getSpanCount
+import com.unan.nexxxup.utils.UIHelper.hideKeyboard
+import java.util.Locale
+import java.util.concurrent.locks.ReentrantLock
+
+class SearchFragment : BaseFragment<FragmentSearchBinding>(
+    BaseFragment.BindingCreator.Bind(FragmentSearchBinding::bind)
+) {
+    companion object {
+        fun List<SearchResponse>.filterSearchResponse(): List<SearchResponse> {
+            return this.filter { response ->
+                if (response is AnimeSearchResponse) {
+                    val status = response.dubStatus
+                    (status.isNullOrEmpty()) || (status.any {
+                        APIRepository.dubStatusActive.contains(it)
+                    })
+                } else {
+                    true
+                }
+            }
+        }
+
+        const val SEARCH_QUERY = "search_query"
+
+        fun newInstance(query: String): Bundle {
+            return Bundle().apply {
+                if (query.isNotBlank()) putString(SEARCH_QUERY, query)
+            }
+        }
+    }
+
+    private val searchViewModel: SearchViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
+    private var bottomSheetDialog: BottomSheetDialog? = null
+
+    private val speechRecognizerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                if (!matches.isNullOrEmpty()) {
+                    val recognizedText = matches[0]
+                    binding?.mainSearch?.setQuery(recognizedText, true)
+                }
+            }
+        }
+
+    override fun pickLayout(): Int? = R.layout.fragment_search
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View? {
+        activity?.window?.setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+        )
+        bottomSheetDialog?.ownShow()
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        hideKeyboard()
+        bottomSheetDialog?.ownHide()
+        activity?.detachBackPressedCallback("SearchFragment")
+        super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        afterPluginsLoadedEvent += ::reloadRepos
+    }
+
+    override fun onStop() {
+        super.onStop()
+        afterPluginsLoadedEvent -= ::reloadRepos
+    }
+
+    var selectedSearchTypes = mutableListOf<TvType>()
+    var selectedApis = mutableSetOf<String>()
+
+    fun search(query: String?) {
+        if (query == null) return
+        // don't resume state from prev search
+        (binding?.searchMasterRecycler?.adapter as? BaseAdapter<*, *>)?.clearState()
+        context?.let { ctx ->
+            val default = enumValues<TvType>().sorted()
+                .map { it.ordinal.toString() }.toSet()
+            val preferredTypes = (PreferenceManager.getDefaultSharedPreferences(ctx)
+                .getStringSet(this.getString(R.string.prefer_media_type_key), default)
+                ?.ifEmpty { default } ?: default)
+                .mapNotNull { it.toIntOrNull() ?: return@mapNotNull null }
+
+            val settings = ctx.getApiSettings()
+
+            val notFilteredBySelectedTypes = selectedApis.filter { name ->
+                settings.contains(name)
+            }.map { name ->
+                name to getApiFromNameNull(name)?.getCustomAdultTypes()
+            }.filter { (_, types) ->
+                types?.any { preferredTypes.contains(it.ordinal) } == true
+            }
+
+            searchViewModel.searchAndCancel(
+                query = query,
+                providersActive = notFilteredBySelectedTypes.filter { (_, types) ->
+                    types?.any { selectedSearchTypes.contains(it) } == true
+                }.ifEmpty { notFilteredBySelectedTypes }.map { it.first }.toSet()
+            )
+        }
+    }
+
+    private fun reloadRepos(success: Boolean = false) = main {
+        searchViewModel.reloadRepos()
+        context?.filterProviderByPreferredMedia()?.let { validAPIs ->
+            bindChips(
+                binding?.tvtypesChipsScroll?.tvtypesChips,
+                selectedSearchTypes,
+                validAPIs.flatMap { api -> api.getCustomAdultTypes() }.distinct()
+            ) { list ->
+                if (selectedSearchTypes.toSet() != list.toSet()) {
+                    DataStoreHelper.searchPreferenceTags = list
+                    selectedSearchTypes.clear()
+                    selectedSearchTypes.addAll(list)
+                }
+            }
+        }
+    }
+
+    override fun fixLayout(view: View) {
+        fixSystemBarsPadding(
+            view,
+            padBottom = isLandscape(),
+            padLeft = false
+        )
+
+        // Fix grid
+        currentSpan = view.context.getSpanCount()
+        binding?.searchAutofitResults?.spanCount = currentSpan
+        HomeFragment.configEvent.invoke()
+    }
+
+    override fun onBindingCreated(
+        binding: FragmentSearchBinding,
+        savedInstanceState: Bundle?
+    ) {
+        reloadRepos()
+        binding.apply {
+            val adapter =
+                SearchAdapter(
+                    searchAutofitResults,
+                ) { callback ->
+                    SearchHelper.handleSearchClickCallback(callback)
+                }
+
+            searchAutofitResults.setRecycledViewPool(SearchAdapter.sharedPool)
+            searchAutofitResults.adapter = adapter
+            searchLoadingBar.alpha = 0f
+        }
+
+        binding.voiceSearch.setOnClickListener { searchView ->
+            searchView?.context?.let { ctx ->
+                try {
+                    if (!SpeechRecognizer.isRecognitionAvailable(ctx)) {
+                        showToast(R.string.speech_recognition_unavailable)
+                    } else {
+                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                            putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                            )
+                            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                            putExtra(
+                                RecognizerIntent.EXTRA_PROMPT,
+                                ctx.getString(R.string.begin_speaking)
+                            )
+                        }
+                        speechRecognizerLauncher.launch(intent)
+                    }
+                } catch (_: Throwable) {
+                    // launch may throw
+                    showToast(R.string.speech_recognition_unavailable)
+                }
+            }
+        }
+
+        val searchExitIcon =
+            binding.mainSearch.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)
+
+        selectedApis = DataStoreHelper.searchPreferenceProviders.toMutableSet()
+
+        binding.searchFilter.setOnClickListener { searchView ->
+            searchView?.context?.let { ctx ->
+                val validAPIs = ctx.filterProviderByPreferredMedia(hasHomePageIsRequired = false)
+                var currentValidApis = listOf<MainAPI>()
+                val currentSelectedApis = if (selectedApis.isEmpty()) validAPIs.map { it.name }
+                    .toMutableSet() else selectedApis
+
+                val builder =
+                    BottomSheetDialog(ctx)
+
+                builder.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+                val selectMainpageBinding: HomeSelectMainpageBinding =
+                    HomeSelectMainpageBinding.inflate(
+                        builder.layoutInflater,
+                        null,
+                        false
+                    )
+                builder.setContentView(selectMainpageBinding.root)
+                builder.show()
+                builder.let { dialog ->
+                    val previousSelectedApis = selectedApis.toSet()
+                    val previousSelectedSearchTypes = selectedSearchTypes.toSet()
+
+                    val isMultiLang = ctx.getApiProviderLangSettings().let { set ->
+                        set.size > 1 || set.contains(AllLanguagesName)
+                    }
+
+                    val cancelBtt = dialog.findViewById<MaterialButton>(R.id.cancel_btt)
+                    val applyBtt = dialog.findViewById<MaterialButton>(R.id.apply_btt)
+
+                    val listView = dialog.findViewById<ListView>(R.id.listview1)
+                    val arrayAdapter = ArrayAdapter<String>(ctx, R.layout.sort_bottom_single_choice)
+                    listView?.adapter = arrayAdapter
+                    listView?.choiceMode = AbsListView.CHOICE_MODE_MULTIPLE
+
+                    listView?.setOnItemClickListener { _, _, i, _ ->
+                        if (currentValidApis.isNotEmpty()) {
+                            val api = currentValidApis[i].name
+                            if (currentSelectedApis.contains(api)) {
+                                listView.setItemChecked(i, false)
+                                currentSelectedApis -= api
+                            } else {
+                                listView.setItemChecked(i, true)
+                                currentSelectedApis += api
+                            }
+                        }
+                    }
+
+                    fun updateList(types: List<TvType>) {
+                        DataStoreHelper.searchPreferenceTags = types
+
+                        arrayAdapter.clear()
+                        currentValidApis = validAPIs.filter { api ->
+                            api.getCustomAdultTypes().any {
+                                types.contains(it)
+                            }
+                        }.sortedBy { it.name.lowercase() }
+
+                        val names = currentValidApis.map {
+                            if (isMultiLang) "${
+                                SubtitleHelper.getFlagFromIso(
+                                    it.lang
+                                )?.plus(" ") ?: ""
+                            }${it.name}" else it.name
+                        }
+                        for ((index, api) in currentValidApis.map { it.name }.withIndex()) {
+                            listView?.setItemChecked(index, currentSelectedApis.contains(api))
+                        }
+
+                        //arrayAdapter.notifyDataSetChanged()
+                        arrayAdapter.addAll(names)
+                        arrayAdapter.notifyDataSetChanged()
+                    }
+
+                    bindChips(
+                        selectMainpageBinding.tvtypesChipsScroll.tvtypesChips,
+                        selectedSearchTypes,
+                        validAPIs.flatMap { api -> api.getCustomAdultTypes() }.distinct()
+                    ) { list ->
+                        updateList(list)
+
+                        // refresh selected chips in main chips
+                        if (selectedSearchTypes.toSet() != list.toSet()) {
+                            selectedSearchTypes.clear()
+                            selectedSearchTypes.addAll(list)
+                            updateChips(
+                                binding.tvtypesChipsScroll.tvtypesChips,
+                                selectedSearchTypes
+                            )
+
+                        }
+                    }
+
+
+                    cancelBtt?.setOnClickListener {
+                        dialog.dismissSafe()
+                    }
+
+                    cancelBtt?.setOnClickListener {
+                        dialog.dismissSafe()
+                    }
+
+                    applyBtt?.setOnClickListener {
+                        //if (currentApiName != selectedApiName) {
+                        //    currentApiName?.let(callback)
+                        //}
+                        dialog.dismissSafe()
+                    }
+
+                    dialog.setOnDismissListener {
+                        DataStoreHelper.searchPreferenceProviders = currentSelectedApis.toList()
+                        selectedApis = currentSelectedApis
+
+                        // run search when dialog is close
+                        if (previousSelectedApis != selectedApis.toSet() || previousSelectedSearchTypes != selectedSearchTypes.toSet()) {
+                            search(binding.mainSearch.query.toString())
+                        }
+                    }
+                    updateList(selectedSearchTypes.toList())
+                }
+            }
+        }
+
+        val settingsManager = context?.let { PreferenceManager.getDefaultSharedPreferences(it) }
+        val isAdvancedSearch = settingsManager?.getBoolean("advanced_search", true) ?: true
+        val isSearchSuggestionsEnabled = settingsManager?.getBoolean("search_suggestions_enabled", true) ?: true
+
+        selectedSearchTypes = DataStoreHelper.searchPreferenceTags.toMutableList()
+
+        if (!isLayout(PHONE)) {
+            binding.searchFilter.isFocusable = true
+            binding.searchFilter.isFocusableInTouchMode = true
+        }
+        
+        // Hide suggestions when search view loses focus (phone only)
+        if (isLayout(PHONE)) {
+            binding.mainSearch.setOnQueryTextFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    searchViewModel.clearSuggestions()
+                }
+            }
+        }
+
+
+        binding.mainSearch.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                if (query.isNotBlank()) {
+                    if (isSearchSuggestionsEnabled) {
+                        searchViewModel.clearSuggestions()
+                    }
+                    search(query)
+                }
+                binding.mainSearch.let {
+                    hideKeyboard(it)
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                val isBlank = newText.isBlank()
+                binding.apply {
+                    searchHistoryRecycler.isVisible = isBlank
+                    if (isBlank) {
+                        searchMasterRecycler.isVisible = false
+                        searchAutofitResults.isVisible = false
+                        searchSuggestionsRecycler.isVisible = false
+                    }
+                }
+                
+                if (isSearchSuggestionsEnabled && !isBlank) {
+                    searchViewModel.fetchSuggestions(newText)
+                } else {
+                    searchViewModel.clearSuggestions()
+                }
+                return true
+            }
+        })
+
+        observe(searchViewModel.searchResponse) {
+            when (it) {
+                is Resource.Success -> {
+                    it.value.let { data ->
+                        val list = data.list
+                        if (list.isNotEmpty()) {
+                            (binding.searchAutofitResults.adapter as? SearchAdapter)?.submitList(
+                                list
+                            )
+                            binding.searchAutofitResults.isVisible = true
+                            binding.searchMasterRecycler.isVisible = false
+                            binding.searchHistoryRecycler.isVisible = false
+                            binding.searchSuggestionsRecycler.isVisible = false
+                        }
+                    }
+                    searchExitIcon?.alpha = 1f
+                    binding.searchLoadingBar.alpha = 0f
+                }
+
+                is Resource.Failure -> {
+                    // Toast.makeText(activity, "Server error", Toast.LENGTH_LONG).show()
+                    searchExitIcon?.alpha = 1f
+                    binding.searchLoadingBar.alpha = 0f
+                }
+
+                is Resource.Loading -> {
+                    searchExitIcon?.alpha = 0f
+                    binding.searchLoadingBar.alpha = 1f
+                }
+            }
+        }
+
+        val listLock = ReentrantLock()
+        observe(searchViewModel.currentSearch) { list ->
+            try {
+                // https://stackoverflow.com/questions/6866238/concurrent-modification-exception-adding-to-an-arraylist
+                listLock.lock()
+
+                val pinnedOrder = DataStoreHelper.pinnedProviders.reversedArray()
+
+                val sortedList = list.toList().sortedWith(compareBy { (providerName, _) ->
+                    val index = pinnedOrder.indexOf(providerName)
+                    if (index == -1) Int.MAX_VALUE else index
+                })
+
+                (binding.searchMasterRecycler.adapter as? ParentItemAdapter)?.apply {
+                    val newItems = sortedList.map { (providerName, providerData) ->
+                        val dataList = providerData.list
+                        val dataListFiltered =
+                            context?.filterSearchResultByFilmQuality(dataList) ?: dataList
+
+                        val homePageList = HomePageList(
+                            providerName,
+                            dataListFiltered
+                        )
+
+                        HomeViewModel.ExpandableHomepageList(
+                            homePageList,
+                            providerData.currentPage,
+                            providerData.hasNext
+                        )
+                    }
+
+                    submitList(newItems)
+                    if (newItems.isNotEmpty()) {
+                        binding.searchMasterRecycler.isVisible = true
+                        binding.searchAutofitResults.isVisible = false
+                        binding.searchHistoryRecycler.isVisible = false
+                        binding.searchSuggestionsRecycler.isVisible = false
+                    }
+                    //notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                logError(e)
+            } finally {
+                listLock.unlock()
+            }
+        }
+
+
+        /*main_search.setOnQueryTextFocusChangeListener { _, b ->
+            if (b) {
+                // https://stackoverflow.com/questions/12022715/unable-to-show-keyboard-automatically-in-the-searchview
+                showInputMethod(view.findFocus())
+            }
+        }*/
+        //main_search.onActionViewExpanded()*/
+
+        val masterAdapter =
+            ParentItemAdapter(id = "masterAdapter".hashCode(), { callback ->
+                SearchHelper.handleSearchClickCallback(callback)
+            }, { item ->
+                bottomSheetDialog = activity?.loadHomepageList(item, dismissCallback = {
+                    bottomSheetDialog = null
+                }, expandCallback = { name -> searchViewModel.expandAndReturn(name) })
+            }, expandCallback = { name ->
+                ioSafe {
+                    searchViewModel.expandAndReturn(name)
+                }
+            })
+
+        val historyAdapter = SearchHistoryAdaptor { click ->
+            val searchItem = click.item
+            when (click.clickAction) {
+                SEARCH_HISTORY_OPEN -> {
+                    if (searchItem == null) return@SearchHistoryAdaptor
+                    searchViewModel.clearSearch()
+                    if (searchItem.type.isNotEmpty())
+                        updateChips(
+                            binding.tvtypesChipsScroll.tvtypesChips,
+                            searchItem.type.toMutableList()
+                        )
+                    binding.mainSearch.setQuery(searchItem.searchText, true)
+                }
+
+                SEARCH_HISTORY_REMOVE -> {
+                    if (searchItem == null) return@SearchHistoryAdaptor
+                    removeKey("$currentAccount/$SEARCH_HISTORY_KEY", searchItem.key)
+                    searchViewModel.updateHistory()
+                }
+                
+                SEARCH_HISTORY_CLEAR -> {
+                    // Show confirmation dialog (from footer button)
+                    activity?.let { ctx ->
+                        val builder: AlertDialog.Builder = AlertDialog.Builder(ctx)
+                        val dialogClickListener =
+                            DialogInterface.OnClickListener { _, which ->
+                                when (which) {
+                                    DialogInterface.BUTTON_POSITIVE -> {
+                                        removeKeys("$currentAccount/$SEARCH_HISTORY_KEY")
+                                        searchViewModel.updateHistory()
+                                    }
+
+                                    DialogInterface.BUTTON_NEGATIVE -> {
+                                    }
+                                }
+                            }
+
+                        try {
+                            builder.setTitle(R.string.clear_history).setMessage(
+                                ctx.getString(R.string.delete_message).format(
+                                    ctx.getString(R.string.history)
+                                )
+                            )
+                                .setPositiveButton(R.string.sort_clear, dialogClickListener)
+                                .setNegativeButton(R.string.cancel, dialogClickListener)
+                                .show().setDefaultFocus()
+                        } catch (e: Exception) {
+                            logError(e)
+                        }
+                    }
+                }
+
+                else -> {
+                    // wth are you doing???
+                }
+            }
+        }
+
+        val suggestionAdapter = SearchSuggestionAdapter { callback ->
+            when (callback.clickAction) {
+                SEARCH_SUGGESTION_CLICK -> {
+                    // Search directly
+                    binding.mainSearch.setQuery(callback.suggestion, true)
+                    searchViewModel.clearSuggestions()
+                }
+                SEARCH_SUGGESTION_FILL -> {
+                    // Fill the search box without searching
+                    binding.mainSearch.setQuery(callback.suggestion, false)
+                }
+                SEARCH_SUGGESTION_CLEAR -> {
+                    // Clear suggestions (from footer button)
+                    searchViewModel.clearSuggestions()
+                }
+            }
+        }
+
+        binding.apply {
+            searchHistoryRecycler.adapter = historyAdapter
+            searchHistoryRecycler.setLinearListLayout(isHorizontal = false, nextRight = FOCUS_SELF)
+            searchHistoryRecycler.isVisible = false
+
+            // Setup suggestions RecyclerView
+            searchSuggestionsRecycler.adapter = suggestionAdapter
+            searchSuggestionsRecycler.layoutManager = LinearLayoutManager(context)
+            searchSuggestionsRecycler.isVisible = false
+
+            searchMasterRecycler.setRecycledViewPool(ParentItemAdapter.sharedPool)
+            searchMasterRecycler.adapter = masterAdapter
+            searchMasterRecycler.layoutManager = GridLayoutManager(context, 1)
+            searchMasterRecycler.isVisible = false
+
+            searchAutofitResults.isVisible = false
+            searchHistoryRecycler.isVisible = true
+
+            // Automatically search the specified query, this allows the app search to launch from intent
+            var sq =
+                arguments?.getString(SEARCH_QUERY) ?: savedInstanceState?.getString(SEARCH_QUERY)
+            if (sq.isNullOrBlank()) {
+                sq = MainActivity.nextSearchQuery
+            }
+
+            sq?.let { query ->
+                if (query.isBlank()) return@let
+                mainSearch.setQuery(query, true)
+                // Clear the query as to not make it request the same query every time the page is opened
+                arguments?.remove(SEARCH_QUERY)
+                savedInstanceState?.remove(SEARCH_QUERY)
+                MainActivity.nextSearchQuery = null
+            }
+        }
+
+        observe(searchViewModel.currentHistory) { list ->
+            (binding.searchHistoryRecycler.adapter as? SearchHistoryAdaptor?)?.submitList(list)
+             // Scroll to top to show newest items (list is sorted by newest first)
+            if (list.isNotEmpty()) {
+                binding.searchHistoryRecycler.scrollToPosition(0)
+            }
+        }
+
+        // Observe search suggestions
+        observe(searchViewModel.searchSuggestions) { suggestions ->
+            val hasSuggestions = suggestions.isNotEmpty()
+            binding.searchSuggestionsRecycler.isVisible = hasSuggestions
+            (binding.searchSuggestionsRecycler.adapter as? SearchSuggestionAdapter?)?.submitList(suggestions)
+            
+            // On non-phone layouts, redirect focus and handle back button
+            if (!isLayout(PHONE)) {
+                if (hasSuggestions) {
+                    binding.tvtypesChipsScroll.tvtypesChips.root.nextFocusDownId = R.id.search_suggestions_recycler
+                    // Attach back button callback to clear suggestions
+                    activity?.attachBackPressedCallback("SearchFragment") {
+                        searchViewModel.clearSuggestions()
+                    }
+                } else {
+                    // Reset to default focus target (history)
+                    binding.tvtypesChipsScroll.tvtypesChips.root.nextFocusDownId = R.id.search_history_recycler
+                    // Detach back button callback when no suggestions
+                    activity?.detachBackPressedCallback("SearchFragment")
+                }
+            }
+        }
+
+        searchViewModel.updateHistory()
+    }
+}

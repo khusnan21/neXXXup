@@ -137,7 +137,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_player"
-        android:name="com.lagradost.cloudstream3.ui.settings.SettingsPlayer"
+        android:name="com.unan.nexxxup.ui.settings.SettingsPlayer"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -161,7 +161,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_ui"
-        android:name="com.lagradost.cloudstream3.ui.settings.SettingsUI"
+        android:name="com.unan.nexxxup.ui.settings.SettingsUI"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -170,7 +170,7 @@
 
     <fragment
         android:id="@+id/navigation_library"
-        android:name="com.lagradost.cloudstream3.ui.library.LibraryFragment"
+        android:name="com.unan.nexxxup.ui.library.LibraryFragment"
         android:label="@string/library"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -179,7 +179,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_general"
-        android:name="com.lagradost.cloudstream3.ui.settings.SettingsGeneral"
+        android:name="com.unan.nexxxup.ui.settings.SettingsGeneral"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -196,7 +196,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_extensions"
-        android:name="com.lagradost.cloudstream3.ui.settings.extensions.ExtensionsFragment"
+        android:name="com.unan.nexxxup.ui.settings.extensions.ExtensionsFragment"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -227,7 +227,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_plugins"
-        android:name="com.lagradost.cloudstream3.ui.settings.extensions.PluginsFragment"
+        android:name="com.unan.nexxxup.ui.settings.extensions.PluginsFragment"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -237,7 +237,7 @@
 
     <fragment
         android:id="@+id/navigation_webview"
-        android:name="com.lagradost.cloudstream3.ui.WebviewFragment"
+        android:name="com.unan.nexxxup.ui.WebviewFragment"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -247,7 +247,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_backup"
-        android:name="com.lagradost.cloudstream3.ui.settings.SettingsBackup"
+        android:name="com.unan.nexxxup.ui.settings.SettingsBackup"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -256,7 +256,7 @@
 
     <fragment
         android:id="@+id/navigation_settings_account"
-        android:name="com.lagradost.cloudstream3.ui.settings.SettingsAccount"
+        android:name="com.unan.nexxxup.ui.settings.SettingsAccount"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -282,7 +282,7 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.lagradost.cloudstream3.ui.home.MultiProviderHomeFragment"
+        android:name="com.unan.nexxxup.ui.home.MultiProviderHomeFragment"
         android:label="@string/title_home"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -300,7 +300,7 @@
 
     <fragment
         android:id="@+id/navigation_single_provider_home"
-        android:name="com.lagradost.cloudstream3.ui.home.HomeFragment"
+        android:name="com.unan.nexxxup.ui.home.HomeFragment"
         android:label="@string/title_home"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -318,7 +318,7 @@
 
     <fragment
         android:id="@+id/navigation_discover"
-        android:name="com.lagradost.cloudstream3.ui.search.DiscoverFragment"
+        android:name="com.unan.nexxxup.ui.search.DiscoverFragment"
         android:label="@string/title_discover"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -328,7 +328,7 @@
 
     <fragment
         android:id="@+id/navigation_search"
-        android:name="com.lagradost.cloudstream3.ui.search.SearchFragment"
+        android:name="com.unan.nexxxup.ui.search.SearchFragment"
         android:label="@string/title_search"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -343,7 +343,7 @@
 
     <fragment
         android:id="@+id/navigation_downloads"
-        android:name="com.lagradost.cloudstream3.ui.download.DownloadFragment"
+        android:name="com.unan.nexxxup.ui.download.DownloadFragment"
         android:label="@string/title_downloads"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -375,7 +375,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.lagradost.cloudstream3.ui.settings.SettingsFragment"
+        android:name="com.unan.nexxxup.ui.settings.SettingsFragment"
         android:layout_height="match_parent"
         android:label="@string/title_settings"
         app:enterAnim="@anim/enter_anim"
@@ -428,7 +428,7 @@
 
     <fragment
         android:id="@+id/navigation_subtitles"
-        android:name="com.lagradost.cloudstream3.ui.subtitles.SubtitlesFragment"
+        android:name="com.unan.nexxxup.ui.subtitles.SubtitlesFragment"
         android:layout_height="match_parent"
         android:label="@string/subtitles_settings"
         app:enterAnim="@anim/enter_anim"
@@ -439,7 +439,7 @@
 
     <fragment
         android:id="@+id/navigation_chrome_subtitles"
-        android:name="com.lagradost.cloudstream3.ui.subtitles.ChromecastSubtitlesFragment"
+        android:name="com.unan.nexxxup.ui.subtitles.ChromecastSubtitlesFragment"
         android:layout_height="match_parent"
         android:label="@string/chromecast_subtitles_settings"
         app:enterAnim="@anim/enter_anim"
@@ -450,7 +450,7 @@
 
     <fragment
         android:id="@+id/navigation_quick_search"
-        android:name="com.lagradost.cloudstream3.ui.quicksearch.QuickSearchFragment"
+        android:name="com.unan.nexxxup.ui.quicksearch.QuickSearchFragment"
         android:layout_height="match_parent"
         android:label="@string/search"
         app:enterAnim="@anim/enter_anim"
@@ -461,7 +461,7 @@
 
     <fragment
         android:id="@+id/navigation_download_child"
-        android:name="com.lagradost.cloudstream3.ui.download.DownloadChildFragment"
+        android:name="com.unan.nexxxup.ui.download.DownloadChildFragment"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -479,7 +479,7 @@
 
     <fragment
         android:id="@+id/navigation_download_queue"
-        android:name="com.lagradost.cloudstream3.ui.download.queue.DownloadQueueFragment"
+        android:name="com.unan.nexxxup.ui.download.queue.DownloadQueueFragment"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -498,7 +498,7 @@
 
     <fragment
         android:id="@+id/navigation_results_phone"
-        android:name="com.lagradost.cloudstream3.ui.result.ResultTrailerPlayer"
+        android:name="com.unan.nexxxup.ui.result.ResultTrailerPlayer"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -523,7 +523,7 @@
 
     <fragment
         android:id="@+id/navigation_results_tv"
-        android:name="com.lagradost.cloudstream3.ui.result.ResultFragmentTv"
+        android:name="com.unan.nexxxup.ui.result.ResultFragmentTv"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -548,7 +548,7 @@
 
     <!--<fragment
         android:id="@+id/navigation_results"
-        android:name="com.lagradost.cloudstream3.ui.result.ResultFragment"
+        android:name="com.unan.nexxxup.ui.result.ResultFragment"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -573,7 +573,7 @@
 
     <fragment
         android:id="@+id/navigation_player"
-        android:name="com.lagradost.cloudstream3.ui.player.GeneratorPlayer"
+        android:name="com.unan.nexxxup.ui.player.GeneratorPlayer"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -583,7 +583,7 @@
 
     <fragment
         android:id="@+id/navigation_test_providers"
-        android:name="com.lagradost.cloudstream3.ui.settings.testing.TestFragment"
+        android:name="com.unan.nexxxup.ui.settings.testing.TestFragment"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -616,7 +616,7 @@
 
     <fragment
         android:id="@+id/navigation_setup_extensions"
-        android:name="com.lagradost.cloudstream3.ui.setup.SetupFragmentExtensions"
+        android:name="com.unan.nexxxup.ui.setup.SetupFragmentExtensions"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -634,7 +634,7 @@
 
     <fragment
         android:id="@+id/navigation_setup_provider_languages"
-        android:name="com.lagradost.cloudstream3.ui.setup.SetupFragmentProviderLanguage"
+        android:name="com.unan.nexxxup.ui.setup.SetupFragmentProviderLanguage"
         android:layout_height="match_parent"
         app:enterAnim="@anim/enter_anim"
         app:exitAnim="@anim/exit_anim"
@@ -645,7 +645,7 @@
 
     <fragment
         android:id="@+id/easterEggMonkeFragment"
-        android:name="com.lagradost.cloudstream3.ui.EasterEggMonkeFragment"
+        android:name="com.unan.nexxxup.ui.EasterEggMonkeFragment"
         android:label="EasterEggMonkeFragment"
         tools:layout="@layout/fragment_easter_egg_monke" />
 </navigation>

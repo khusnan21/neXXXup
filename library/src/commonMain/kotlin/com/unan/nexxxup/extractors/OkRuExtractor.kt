@@ -1,0 +1,25 @@
+// ! Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
+
+package com.unan.nexxxup.extractors
+
+import com.unan.nexxxup.Prerelease
+
+open class OkRuSSL : Odnoklassniki() {
+    override var name    = "OkRuSSL"
+    override var mainUrl = "https://ok.ru"
+}
+
+open class OkRuHTTP : Odnoklassniki() {
+    override var name    = "OkRuHTTP"
+    override var mainUrl = "http://ok.ru"
+}
+
+@Prerelease
+class OkRuSSLMobile : OkRuSSL() {
+    override var mainUrl = "https://m.ok.ru"
+}
+
+@Prerelease
+class OkRuHTTPMobile : OkRuHTTP() {
+    override var mainUrl = "http://m.ok.ru"
+}
