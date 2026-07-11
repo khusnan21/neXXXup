@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.unan.nexxxup.AllLanguagesName
 import com.unan.nexxxup.BuildConfig
 import com.unan.nexxxup.databinding.FragmentPluginsBinding
@@ -34,7 +34,8 @@ const val PLUGINS_BUNDLE_LOCAL = "isLocal"
 class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
     BaseFragment.BindingCreator.Inflate(FragmentPluginsBinding::inflate)
 ) {
-    private lateinit var pluginViewModel: PluginsViewModel
+
+    private val pluginViewModel: PluginsViewModel by activityViewModels()
 
     override fun onDestroyView() {
         pluginViewModel.clear() // clear for the next observe
@@ -46,6 +47,11 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
     }
 
     override fun onBindingCreated(binding: FragmentPluginsBinding) {
+        // Since the ViewModel is getting reused the tvTypes must be cleared between uses
+        pluginViewModel.tvTypes.clear()
+        pluginViewModel.selectedLanguages = listOf()
+        pluginViewModel.clear()
+
         // Filter by language set on preferred media - completely bypassed to allow all countries/languages
         /*
         activity?.let {
@@ -57,15 +63,8 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
         */
 
         val name = arguments?.getString(PLUGINS_BUNDLE_NAME)
-        val url = arguments?.getString(PLUGINS_BUNDLE_URL) ?: return
-        val isLocal = arguments?.getBoolean(PLUGINS_BUNDLE_LOCAL) ?: false
-        pluginViewModel = ViewModelProvider(this)[PluginsViewModel::class.java]
-
-        // Since the ViewModel is getting reused the tvTypes must be cleared between uses
-        pluginViewModel.tvTypes.clear()
-        pluginViewModel.selectedLanguages = listOf()
-        pluginViewModel.clear()
-
+        val url = arguments?.getString(PLUGINS_BUNDLE_URL)
+        val isLocal = arguments?.getBoolean(PLUGINS_BUNDLE_LOCAL) == true
         // download all extensions button
         val downloadAllButton = binding.settingsToolbar.menu?.findItem(R.id.download_all)
 
@@ -133,6 +132,9 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
                     dispatchBackPressed()
                 }
             }
+            searchView?.setOnQueryTextFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) pluginViewModel.search(null)
+            }
 
             searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
@@ -160,8 +162,8 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
             )
             setRecycledViewPool(PluginAdapter.sharedPool)
             adapter =
-                PluginAdapter { plugin, isUpdate ->
-                    pluginViewModel.handlePluginAction(activity, listOf(url), plugin, isLocal, isUpdate)
+                PluginAdapter {
+                    pluginViewModel.handlePluginAction(activity, url, it, isLocal)
                 }
         }
 
@@ -185,7 +187,7 @@ class PluginsFragment : BaseFragment<FragmentPluginsBinding>(
 
             binding.tvtypesChipsScroll.root.isVisible = false
         } else {
-            pluginViewModel.updatePluginList(context, listOf(url))
+            pluginViewModel.updatePluginList(context, url)
             binding.tvtypesChipsScroll.root.isVisible = true
             // not needed for users but may be useful for devs
             downloadAllButton?.isVisible = BuildConfig.DEBUG

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.unan.nexxxup.NexxxupApp.Companion.getKey
+import com.unan.nexxxup.CloudStreamApp.Companion.getKey
 import com.unan.nexxxup.R
 import com.unan.nexxxup.amap
 import com.unan.nexxxup.mvvm.debugAssert
@@ -48,9 +48,8 @@ class ExtensionsViewModel : ViewModel() {
     //TODO CACHE GET REQUESTS
     // DO not use viewModelScope.launchSafe, it will ANR on slow internet
     fun loadStats() = ioSafe {
-        val urls = (getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()) +
-                (getKey<Array<RepositoryData>>(RepositoryManager.NEX_REPOSITORIES_KEY) ?: emptyArray()) +
-                PREBUILT_REPOSITORIES
+        val urls = (getKey<Array<RepositoryData>>(REPOSITORIES_KEY)
+            ?: emptyArray()) + PREBUILT_REPOSITORIES
 
         val onlinePlugins = urls.toList().amap {
             RepositoryManager.getRepoPlugins(it.url)?.toList() ?: emptyList()
@@ -84,11 +83,10 @@ class ExtensionsViewModel : ViewModel() {
         _pluginStats.postValue(stats)
     }
 
-    private fun repos() = (getKey<Array<RepositoryData>>(REPOSITORIES_KEY) ?: emptyArray()) +
-            (getKey<Array<RepositoryData>>(RepositoryManager.NEX_REPOSITORIES_KEY) ?: emptyArray()) +
-            PREBUILT_REPOSITORIES
+    private fun repos() = (getKey<Array<RepositoryData>>(REPOSITORIES_KEY)
+        ?: emptyArray()) + PREBUILT_REPOSITORIES
 
-    fun loadRepositories() = ioSafe {
+    fun loadRepositories() {
         val urls = repos()
         _repositories.postValue(urls)
     }
