@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/primaryBlackBackground"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/home_none_padding"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <FrameLayout
+        android:id="@+id/home_preview_viewpager_text"
+        android:layout_width="match_parent"
+        android:layout_height="550dp">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/home_preview_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+
+        <!-- Gradient Overlay -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_shadow" />
+
+        <LinearLayout
+            android:id="@+id/home_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/home_back_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/rounded_button_radius"
+                    android:backgroundTint="@color/obsidian_glass"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_baseline_arrow_back_24"
+                    android:visibility="gone"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/google_sans"
+                    android:letterSpacing="0.2"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/home_search_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/rounded_button_radius"
+                    android:backgroundTint="@color/obsidian_glass"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp"
+                    android:src="@drawable/search_icon"
+                    app:tint="@color/white" />
+
+                <ImageView
+                    android:id="@+id/home_download_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/rounded_button_radius"
+                    android:backgroundTint="@color/obsidian_glass"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_download_filled"
+                    app:tint="@color/white" />
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/home_search"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!--
+                        <TextView
+                            android:visibility="gone"
+                            android:id="@+id/test_search"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:layout_gravity="start"
+                            android:gravity="center"
+
+                            android:textSize="20dp"
+                            android:layout_margin="20dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/search"
+                            android:textColor="@color/white"
+                            app:drawableLeftCompat="@drawable/search_icon"
+                            app:tint="@color/white" />
+        -->
+
+        <LinearLayout
+            android:id="@+id/home_preview_title_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="40dp">
+
+            <LinearLayout
+                android:id="@+id/home_preview_bookmark_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_button_radius"
+                android:backgroundTint="#20FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:id="@+id/home_preview_bookmark_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_baseline_add_24"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:id="@+id/home_preview_bookmark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/google_sans"
+                    android:text="@string/none"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/home_preview_play"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="16dp"
+                android:backgroundTint="@color/white"
+                android:fontFamily="@font/google_sans"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/home_play"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_baseline_play_arrow_24"
+                app:iconSize="24dp"
+                app:iconTint="@color/black" />
+
+            <LinearLayout
+                android:id="@+id/home_preview_info"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="#20FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_outline_info_24"
+                    app:tint="@color/white" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/home_category_chips_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/home_category_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:singleLine="true" />
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/home_watch_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/home_watch_parent_item_title"
+            style="@style/WatchHeaderText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="0dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/home_more_info"
+            android:padding="12dp"
+            android:text="@string/continue_watching"
+            app:drawableRightCompat="@drawable/ic_baseline_arrow_forward_24"
+            app:drawableTint="?attr/white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/home_watch_child_recyclerview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:descendantFocusability="afterDescendants"
+            android:orientation="horizontal"
+            android:paddingHorizontal="5dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/home_result_grid" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/home_bookmarked_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <FrameLayout
+            android:id="@+id/home_bookmark_parent_item_title"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="50dp"
+                android:fadingEdge="horizontal"
+
+                android:nextFocusLeft="@id/nav_rail_view"
+                android:nextFocusUp="@id/home_watch_child_recyclerview"
+                android:nextFocusForward="@id/home_bookmarked_child_recyclerview"
+                android:paddingStart="12dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="12dp"
+
+                android:paddingBottom="5dp"
+                android:requiresFadingEdge="horizontal">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/home_type_watching_btt"
+                        style="@style/ChipFilled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:nextFocusLeft="@id/nav_rail_view"
+                        android:nextFocusRight="@id/home_plan_to_watch_btt"
+                        android:text="@string/type_watching" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/home_plan_to_watch_btt"
+                        style="@style/ChipFilled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:nextFocusLeft="@id/home_type_watching_btt"
+                        android:nextFocusRight="@id/home_type_on_hold_btt"
+                        android:text="@string/type_plan_to_watch" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/home_type_on_hold_btt"
+                        style="@style/ChipFilled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:nextFocusLeft="@id/home_plan_to_watch_btt"
+                        android:nextFocusRight="@id/home_type_dropped_btt"
+                        android:text="@string/type_on_hold" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/home_type_dropped_btt"
+                        style="@style/ChipFilled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:nextFocusLeft="@id/home_type_on_hold_btt"
+                        android:nextFocusRight="@id/home_type_completed_btt"
+                        android:text="@string/type_dropped" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/home_type_completed_btt"
+                        style="@style/ChipFilled"
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+                        android:nextFocusLeft="@id/home_type_dropped_btt"
+                        android:text="@string/type_completed" />
+                </com.google.android.material.chip.ChipGroup>
+
+            </HorizontalScrollView>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="@string/home_more_info"
+                android:src="@drawable/ic_baseline_arrow_forward_24"
+                app:drawableTint="?attr/white" />
+        </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/home_bookmarked_child_recyclerview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:descendantFocusability="afterDescendants"
+            android:orientation="horizontal"
+            android:paddingHorizontal="5dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/home_result_grid" />
+    </LinearLayout>
+</LinearLayout>

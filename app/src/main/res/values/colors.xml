@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#5E64FF</color>
+    <color name="colorPrimarySecond">@color/colorPrimary</color>
+    <color name="colorSearch">#2EFFFFFF</color> <!--#3444D1 @color/itemBackground-->
+    <color name="colorOngoing">#00E5FF</color> <!--FF8181-->
+    <color name="colorPrimaryDark">#06070E</color>
+    <color name="colorAccent">#5E64FF</color> <!-- 818fff-->
+
+    <color name="primaryGrayBackground">#E6111326</color> <!--0f0f10 0E0E10 303135 2B2C30 -->
+    <color name="primaryBlackBackground">#06070E</color> <!--1C1C20 191a1f 19181E 202125 1C1C20 -->
+    <color name="iconGrayBackground">#2EFFFFFF</color> <!--141419 202125-->
+    <color name="boxItemBackground">#C8111326</color> <!-- 17171B 1B1B20-->
+
+    <color name="textColor">#FFFFFF</color> <!--FFF-->
+    <color name="grayTextColor">@color/text_medium_emphasis</color> <!-- 5e5f62-->
+    <color name="grayShimmer">#212338</color> <!-- 5e5f62-->
+
+    <color name="searchColorTransparent">#1AFFFFFF</color> <!--DADADA-->
+    <color name="transparent">#00000000</color>
+
+    <color name="white">#FFF</color>
+    <color name="black">#000</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_400">#BDBDBD</color>
+
+    <color name="whiteText">#FFF</color>
+    <color name="blackText">#000</color>
+
+    <color name="progressBackgroundColor">#1AFFFFFF</color>
+
+    <!-- Obsidian Cinema Palette -->
+    <color name="obsidian_deep">#06070E</color>
+    <color name="obsidian_card">#C8111326</color>
+    <color name="obsidian_glass">#21FFFFFF</color>
+    <color name="astro_purple">#5E64FF</color>
+    <color name="astro_purple_dim">#265E64FF</color>
+    <color name="cinema_gold">#FFD700</color>
+    <color name="text_high_emphasis">#FFFFFF</color>
+    <color name="text_medium_emphasis">#AEC3EA</color>
+
+    <color name="dubColorBg">@color/astro_purple</color>
+    <color name="subColorBg">#F53B66</color>
+    <color name="typeColorBg">#3700B3</color>
+
+    <color name="adultColor">#FF6F63</color> <!-- same as sub color -->
+
+    <color name="video_ripple">#80FFFFFF</color>
+    <color name="video_button_ripple">#32FFFFFF</color>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="darkBarTransparent">#C0121212</color>
+    <color name="skipOpTransparent">#4D121212</color>
+    <color name="darkBar">#121212</color>
+    <color name="videoProgress">#66B5B5B5</color> <!--66B5B5B5-->
+    <!--<color name="videoCache">#663D50FA</color>--> <!--66B5B5B5-->
+
+    <color name="iconColor">#9ba0a6</color>
+
+    <!-- <color name="usedStorageColor">?attr/white</color>#fff-->
+    <!-- <color name="freeStorageColor">?attr/grayTextColor</color> #676767-->
+
+    <color name="colorPrimaryOrange">#CE8500</color>
+    <color name="colorPrimaryRed">#FF5252</color>
+    <color name="colorTestPass">#48E484</color>
+    <color name="colorTestFail">#ea596e</color>
+    <color name="colorTestWarning">#FF9800</color>
+    <color name="playIconBackground">#B3000000</color>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.chip.ChipGroup android:layout_width="match_parent"
+    style="@style/ChipParent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:id="@+id/home_select_group"
+    android:descendantFocusability="afterDescendants"
+    app:singleSelection="false"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/home_select_all"
+        style="@style/ChipFilled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/all_adult" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/home_select_asian"
+        style="@style/ChipFilled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/asian_adult" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/home_select_western"
+        style="@style/ChipFilled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/western_adult" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/home_select_webcam"
+        style="@style/ChipFilled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/webcam" />
+</com.google.android.material.chip.ChipGroup>
