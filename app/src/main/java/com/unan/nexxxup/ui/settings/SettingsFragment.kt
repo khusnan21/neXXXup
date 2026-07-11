@@ -225,6 +225,8 @@ class SettingsFragment : BaseFragment<MainSettingsBinding>(
                 settingsPlayer to R.id.action_navigation_global_to_navigation_settings_player,
                 settingsCredits to R.id.action_navigation_global_to_navigation_settings_account,
                 settingsUi to R.id.action_navigation_global_to_navigation_settings_ui,
+                settingsExtensions to R.id.action_navigation_global_to_navigation_settings_extensions,
+                settingsExtractors to R.id.action_navigation_global_to_navigation_settings_extractors,
                 settingsBackup to R.id.action_navigation_global_to_navigation_settings_backup,
             ).forEach { (view, navigationId) ->
                 view.apply {

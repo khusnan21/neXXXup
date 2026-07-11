@@ -57,6 +57,10 @@ class PluginsViewModel : ViewModel() {
     private var _filteredPlugins = MutableLiveData<PluginViewDataUpdate>()
     var filteredPlugins: LiveData<PluginViewDataUpdate> = _filteredPlugins
 
+    /** localPlugins specifically holds the downloaded/local plugins for the installed list */
+    private var _localPlugins = MutableLiveData<PluginViewDataUpdate>()
+    var localPlugins: LiveData<PluginViewDataUpdate> = _localPlugins
+
     val tvTypes = mutableListOf<String>()
     var selectedLanguages = listOf<String>()
     private var currentQuery: String? = null
@@ -68,9 +72,10 @@ class PluginsViewModel : ViewModel() {
         private fun isDownloaded(
             context: Context,
             pluginName: String,
-            repositoryUrl: String
+            repositoryUrl: String,
+            pluginUrl: String? = null
         ): Boolean {
-            return getPluginPath(context, pluginName, repositoryUrl).exists()
+            return getPluginPath(context, pluginName, repositoryUrl, pluginUrl).exists()
         }
 
         private suspend fun getPlugins(
@@ -83,7 +88,7 @@ class PluginsViewModel : ViewModel() {
                     return it
                 }
             }
-            return RepositoryManager.getRepoPlugins(repositoryUrl)
+            return RepositoryManager.getRepoPlugins(repositoryUrl, !canUseCache)
                 ?.also { repositoryCache[repositoryUrl] = it } ?: emptyList()
         }
 
@@ -99,7 +104,8 @@ class PluginsViewModel : ViewModel() {
                     !isDownloaded(
                         activity,
                         plugin.second.internalName,
-                        repositoryUrl
+                        repositoryUrl,
+                        plugin.second.url
                     )
                 }.also { list ->
                     main {
@@ -142,7 +148,7 @@ class PluginsViewModel : ViewModel() {
                             ),
                             Toast.LENGTH_SHORT
                         )
-                        viewModel?.updatePluginListPrivate(activity, repositoryUrl)
+                        viewModel?.updatePluginListPrivate(activity, listOf(repositoryUrl))
                     } else if (list.isNotEmpty()) {
                         showToast(R.string.download_failed, Toast.LENGTH_SHORT)
                     }
@@ -156,11 +162,12 @@ class PluginsViewModel : ViewModel() {
      * */
     fun handlePluginAction(
         activity: Activity?,
-        repositoryUrl: String,
+        repositoryUrls: List<String>,
         plugin: Plugin,
-        isLocal: Boolean
+        isLocal: Boolean,
+        forceDownload: Boolean = false
     ) = ioSafe {
-        Log.i(TAG, "handlePluginAction = $repositoryUrl, $plugin, $isLocal")
+        Log.i(TAG, "handlePluginAction = $repositoryUrls, $plugin, $isLocal, $forceDownload")
 
         if (activity == null) return@ioSafe
         val (repo, metadata) = plugin
@@ -168,14 +175,15 @@ class PluginsViewModel : ViewModel() {
         val file = if (isLocal) File(plugin.second.url) else getPluginPath(
             activity,
             plugin.second.internalName,
-            plugin.first
+            plugin.first,
+            metadata.url
         )
 
-        val (success, message) = if (file.exists()) {
+        val (success, message) = if (file.exists() && !forceDownload) {
             PluginManager.deletePlugin(file) to R.string.plugin_deleted
         } else {
             val isEnabled = plugin.second.status != PROVIDER_STATUS_DOWN
-            val message = if (isEnabled) R.string.plugin_loaded else R.string.plugin_downloaded
+            val message = if (file.exists()) R.string.plugin_loaded else if (isEnabled) R.string.plugin_loaded else R.string.plugin_downloaded
             PluginManager.downloadPlugin(
                 activity,
                 metadata.url,
@@ -196,18 +204,21 @@ class PluginsViewModel : ViewModel() {
             if (isLocal)
                 updatePluginListLocal()
             else
-                updatePluginListPrivate(activity, repositoryUrl)
+                updatePluginListPrivate(activity, repositoryUrls)
     }
 
-    private suspend fun updatePluginListPrivate(context: Context, repositoryUrl: String) {
-        val isAdult = true
+    private suspend fun updatePluginListPrivate(context: Context, repositoryUrls: List<String>) {
+        val settingsManager = PreferenceManager.getDefaultSharedPreferences(context)
+        val isAdult = settingsManager.getBoolean("enable_nsfw_on_providers_key", false)
 
-        val plugins = getPlugins(repositoryUrl)
+        val plugins = repositoryUrls.flatMap { repositoryUrl ->
+            getPlugins(repositoryUrl)
+        }
         val list = plugins.filter {
             // Show all non-nsfw plugins or all if nsfw is enabled
             it.second.tvTypes?.contains(TvType.NSFW.name) != true || isAdult
         }.map { plugin ->
-            PluginViewData(plugin, isDownloaded(context, plugin.second.internalName, plugin.first))
+            PluginViewData(plugin, isDownloaded(context, plugin.second.internalName, plugin.first, plugin.second.url))
         }
 
         this.plugins = list
@@ -237,16 +248,28 @@ class PluginsViewModel : ViewModel() {
     }
 
     private fun List<PluginViewData>.sortByQuery(query: String?): List<PluginViewData> {
-        return if (query == null) {
+        return if (query.isNullOrBlank()) {
             // Return list to base state if no query
             this.sortedBy { it.plugin.second.name }
         } else {
-            this.sortedBy {
-                -FuzzySearch.partialRatio(
+            this.mapNotNull {
+                // Try matching name
+                val score = FuzzySearch.partialRatio(
                     it.plugin.second.name.lowercase(),
                     query.lowercase()
-                )
-            }
+                ).takeIf { score -> score > 80 } ?:
+                // Fallback to description, but limit characters to reduce lag
+                it.plugin.second.description?.lowercase()?.take(64)
+                    ?.let { description ->
+                        FuzzySearch.partialRatio(
+                            description,
+                            query.lowercase()
+                        )
+                    }?.takeIf { score -> score > 80 } ?: return@mapNotNull null
+                it to score
+            }.sortedBy {
+                -it.second
+            }.map { it.first }
         }
     }
 
@@ -263,10 +286,10 @@ class PluginsViewModel : ViewModel() {
         )
     }
 
-    fun updatePluginList(context: Context?, repositoryUrl: String) = viewModelScope.launchSafe {
+    fun updatePluginList(context: Context?, repositoryUrls: List<String>) = viewModelScope.launchSafe(kotlinx.coroutines.Dispatchers.IO) {
         if (context == null) return@launchSafe
-        Log.i(TAG, "updatePluginList = $repositoryUrl")
-        updatePluginListPrivate(context, repositoryUrl)
+        Log.i(TAG, "updatePluginList = $repositoryUrls")
+        updatePluginListPrivate(context, repositoryUrls)
     }
 
     fun search(query: String?) {
@@ -279,7 +302,7 @@ class PluginsViewModel : ViewModel() {
     /**
      * Update the list but only with the local data. Used for file management.
      * */
-    fun updatePluginListLocal() = viewModelScope.launchSafe {
+    fun updatePluginListLocal() = viewModelScope.launchSafe(kotlinx.coroutines.Dispatchers.IO) {
         Log.i(TAG, "updatePluginList = local")
 
         val downloadedPlugins = (PluginManager.getPluginsOnline() + PluginManager.getPluginsLocal())
@@ -288,8 +311,7 @@ class PluginsViewModel : ViewModel() {
                 PluginViewData("" to it.toSitePlugin(), true)
             }
 
-        plugins = downloadedPlugins
-        _filteredPlugins.postValue(
+        _localPlugins.postValue(
             false to downloadedPlugins.filterTvTypes().filterLang().sortByQuery(currentQuery)
         )
     }

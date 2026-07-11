@@ -12,7 +12,6 @@ import com.unan.nexxxup.ui.BasePreferenceFragmentCompat
 import com.unan.nexxxup.ui.settings.Globals.EMULATOR
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.getPref
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.hideOn
-import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.setPaddingBottom
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.setToolBarScrollFlags
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.setUpToolbar
 import com.unan.nexxxup.ui.settings.utils.getChooseFolderLauncher
@@ -25,12 +24,17 @@ import com.unan.nexxxup.utils.UIHelper.hideKeyboard
 import com.unan.nexxxup.mvvm.logError
 import com.unan.nexxxup.mvvm.safe
 
-class SettingsBackup : BasePreferenceFragmentCompat() {
+class SettingsBackup : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout.fragment_settings_backup) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpToolbar(R.string.pref_category_backup)
-        setPaddingBottom()
+        
         setToolBarScrollFlags()
+
+        val settingsManager = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        bindPreferences(view)
+
     }
 
     private val pathPicker = getChooseFolderLauncher { uri, path ->
@@ -44,17 +48,17 @@ class SettingsBackup : BasePreferenceFragmentCompat() {
     }
 
     @Suppress("DEPRECATION_ERROR")
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    fun bindPreferences(view: android.view.View) {
         hideKeyboard()
-        setPreferencesFromResource(R.xml.settings_backup, rootKey)
+        
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        getPref(R.string.backup_key)?.setOnPreferenceClickListener {
+        view.findViewById<android.view.View>(R.id.btn_backup_key)?.setOnClickListener {
             BackupUtils.backup(activity)
-            return@setOnPreferenceClickListener true
+            return@setOnClickListener
         }
 
-        getPref(R.string.automatic_backup_key)?.setOnPreferenceClickListener {
+        view.findViewById<android.view.View>(R.id.btn_automatic_backup_key)?.setOnClickListener {
             val prefNames = resources.getStringArray(R.array.periodic_work_names)
             val prefValues = resources.getIntArray(R.array.periodic_work_values)
             val current = settingsManager.getInt(getString(R.string.automatic_backup_key), 0)
@@ -74,15 +78,16 @@ class SettingsBackup : BasePreferenceFragmentCompat() {
                     prefValues[index].toLong()
                 )
             }
-            return@setOnPreferenceClickListener true
+            return@setOnClickListener
         }
 
-        getPref(R.string.restore_key)?.setOnPreferenceClickListener {
+        view.findViewById<android.view.View>(R.id.btn_restore_key)?.setOnClickListener {
             activity?.restorePrompt()
-            return@setOnPreferenceClickListener true
+            return@setOnClickListener
         }
 
-        getPref(R.string.backup_path_key)?.hideOn(EMULATOR)?.setOnPreferenceClickListener {
+        if (com.unan.nexxxup.ui.settings.Globals.isLayout(EMULATOR)) view.findViewById<android.view.View>(R.id.btn_backup_path_key)?.visibility = android.view.View.GONE
+        view.findViewById<android.view.View>(R.id.btn_backup_path_key)?.setOnClickListener {
             val dirs = getBackupDirsForDisplay()
             val currentDir =
                 settingsManager.getString(getString(R.string.backup_dir_key), null)
@@ -109,7 +114,7 @@ class SettingsBackup : BasePreferenceFragmentCompat() {
                     }
                 }
             }
-            return@setOnPreferenceClickListener true
+            return@setOnClickListener
         }
     }
 

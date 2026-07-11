@@ -44,7 +44,7 @@ class RepositoryViewHolderState(view: ViewBinding) : ViewHolderState<Any>(view) 
 }
 
 class PluginAdapter(
-    val iconClickCallback: (Plugin) -> Unit
+    val iconClickCallback: (Plugin, Boolean) -> Unit
 ) : NoStateAdapter<PluginViewData>(diffCallback = BaseDiffCallback(itemSame = { a, b ->
     a.plugin.second.internalName == b.plugin.second.internalName && a.plugin.first == b.plugin.first
 })) {
@@ -81,15 +81,23 @@ class PluginAdapter(
         binding.mainText.alpha = alpha
         binding.subText.alpha = alpha
 
-        val drawableInt = if (item.isDownloaded)
-            R.drawable.ic_baseline_delete_outline_24
-        else R.drawable.netflix_download
+        val localPlugin = (PluginManager.getPluginsOnline() + PluginManager.getPluginsLocal())
+            .distinctBy { it.filePath }
+            .find { it.internalName == metadata.internalName }
+
+        val hasUpdate = item.isDownloaded && localPlugin != null && metadata.version > localPlugin.version && metadata.version != com.unan.nexxxup.plugins.PLUGIN_VERSION_NOT_SET
+
+        val drawableInt = when {
+            hasUpdate -> R.drawable.ic_baseline_autorenew_24
+            item.isDownloaded -> R.drawable.ic_baseline_delete_outline_24
+            else -> R.drawable.netflix_download
+        }
 
         binding.nsfwMarker.isVisible = false
         binding.actionButton.setImageResource(drawableInt)
 
         binding.actionButton.setOnClickListener {
-            iconClickCallback.invoke(item.plugin)
+            iconClickCallback.invoke(item.plugin, hasUpdate)
         }
         itemView.setOnClickListener {
             if (isLocal) return@setOnClickListener
@@ -130,8 +138,30 @@ class PluginAdapter(
             } else {
                 binding.actionSettings.isVisible = false
             }
+
+            // Turnstile Settings in the list directly
+            binding.actionTurnstile.isVisible = true
+            binding.actionTurnstile.setOnClickListener {
+                val regions = listOf("Default (Off)", "Indonesia (id-ID)", "Global")
+                val key = "turnstile_region_${metadata.name}"
+                val currentIdx = itemView.context.getSharedPreferences("turnstile", 0)?.getInt(key, 0) ?: 0
+                
+                com.unan.nexxxup.utils.SingleSelectionHelper.run {
+                    val activity = itemView.context.getActivity() as AppCompatActivity
+                    activity.showDialog(
+                        regions,
+                        currentIdx,
+                        "Turnstile Bypass",
+                        true,
+                        {}
+                    ) { selectedIdx ->
+                        itemView.context.getSharedPreferences("turnstile", 0)?.edit()?.putInt(key, selectedIdx)?.apply()
+                    }
+                }
+            }
         } else {
             binding.actionSettings.isVisible = false
+            binding.actionTurnstile.isVisible = false
         }
 
         val url = metadata.iconUrl?.replace(
