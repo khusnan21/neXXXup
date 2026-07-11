@@ -20,8 +20,8 @@ kotlin {
     version = "1.0.1"
 
     android {
-        // If this is the same com.unan.nexxxup.R stops working
-        namespace = "com.unan.api"
+        // If this is the same com.lagradost.cloudstream3.R stops working
+        namespace = "com.lagradost.api"
 
         compileSdk = libs.versions.compileSdk.get().toInt()
         minSdk = libs.versions.minSdk.get().toInt()
@@ -47,8 +47,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
-                optIn("com.unan.nexxxup.InternalAPI")
-                optIn("com.unan.nexxxup.Prerelease")
+                optIn("com.lagradost.cloudstream3.InternalAPI")
+                optIn("com.lagradost.cloudstream3.Prerelease")
             }
         }
 
@@ -72,7 +72,7 @@ tasks.withType<KotlinJvmCompile> {
 }
 
 buildkonfig {
-    packageName = "com.unan.api"
+    packageName = "com.lagradost.api"
     exposeObjectWithName = "BuildConfig"
 
     defaultConfigs {
@@ -89,7 +89,7 @@ buildkonfig {
 publishing {
     publications {
         withType<MavenPublication> {
-            groupId = "com.unan.api"
+            groupId = "com.lagradost.api"
         }
     }
 }

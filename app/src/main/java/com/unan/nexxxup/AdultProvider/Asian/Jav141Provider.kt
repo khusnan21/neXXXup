@@ -136,14 +136,7 @@ class Jav141Provider : MainAPI() {
                 var linkName = a.text().trim()
                 if (linkName.isEmpty()) linkName = "Torrent"
                 callback.invoke(
-                    newExtractorLink(
-                        name,
-                        linkName,
-                        fixUrl(href),
-                        "",
-                        0,
-                        false
-                    )
+                    newExtractorLink(source = name, name = linkName, url = fixUrl(href), type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
                 )
             }
         }

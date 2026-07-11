@@ -65,6 +65,7 @@ import com.unan.nexxxup.utils.extractorApis
 import com.unan.nexxxup.APIHolder.allProviders
 import com.unan.nexxxup.APIHolder.apis
 import com.unan.nexxxup.APIHolder.initAll
+import com.unan.nexxxup.app
 import com.unan.nexxxup.NexxxupApp.Companion.getKey
 import com.unan.nexxxup.NexxxupApp.Companion.removeKey
 import com.unan.nexxxup.NexxxupApp.Companion.setKey

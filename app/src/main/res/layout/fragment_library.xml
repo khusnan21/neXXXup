@@ -152,7 +152,7 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <com.unan.nexxxup.ui.AutofitRecyclerView
+            <com.lagradost.cloudstream3.ui.AutofitRecyclerView
                 android:id="@+id/library_history_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

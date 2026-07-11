@@ -129,24 +129,15 @@ class UncenXProvider : MainAPI() {
         if (m3u8Match != null) {
             callback.invoke(
                 newExtractorLink(
-                    name,
-                    "HLS",
-                    m3u8Match.groupValues[1],
-                    "",
-                    0,
-                    true
+                    source = name,
+                    name = "HLS",
+                    url = m3u8Match.groupValues[1],
+                    type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO
                 )
             )
         } else if (mp4Match != null) {
             callback.invoke(
-                newExtractorLink(
-                    name,
-                    "MP4",
-                    mp4Match.groupValues[1],
-                    "",
-                    0,
-                    false
-                )
+                newExtractorLink(source = name, name = "MP4", url = mp4Match.groupValues[1], type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
             )
         }
         

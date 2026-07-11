@@ -130,14 +130,7 @@ class Jav98Provider : MainAPI() {
             magnetUrl = magnetUrl.replace("&amp;", "&")
             
             callback.invoke(
-                newExtractorLink(
-                    this.name,
-                    name,
-                    magnetUrl,
-                    "",
-                    0,
-                    false
-                )
+                newExtractorLink(source = this.name, name = name, url = magnetUrl, type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
             )
         }
         return true
