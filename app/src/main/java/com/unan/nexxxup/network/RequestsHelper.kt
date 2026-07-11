@@ -5,8 +5,8 @@ import androidx.preference.PreferenceManager
 import com.unan.nexxxup.R
 import com.unan.nexxxup.USER_AGENT
 import com.unan.nexxxup.mvvm.safe
-import com.unan.nicehttp.Requests
-import com.unan.nicehttp.ignoreAllSSLErrors
+import com.lagradost.nicehttp.Requests
+import com.lagradost.nicehttp.ignoreAllSSLErrors
 import okhttp3.Cache
 import okhttp3.Headers
 import okhttp3.Headers.Companion.toHeaders

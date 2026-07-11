@@ -8,7 +8,7 @@ import com.unan.nexxxup.utils.ExtractorLinkType
 import com.unan.nexxxup.utils.INFER_TYPE
 import com.unan.nexxxup.utils.newExtractorLink
 import com.unan.nexxxup.utils.Qualities
-import com.unan.nicehttp.RequestBodyTypes
+import com.lagradost.nicehttp.RequestBodyTypes
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 

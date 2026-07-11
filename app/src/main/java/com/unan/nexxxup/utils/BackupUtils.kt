@@ -31,8 +31,8 @@ import com.unan.nexxxup.utils.downloader.DownloadQueueManager.QUEUE_KEY
 import com.unan.nexxxup.utils.downloader.VideoDownloadManager.KEY_DOWNLOAD_INFO
 import com.unan.nexxxup.utils.downloader.VideoDownloadManager.KEY_RESUME_IN_QUEUE
 import com.unan.nexxxup.utils.downloader.VideoDownloadManager.KEY_RESUME_PACKAGES
-import com.unan.safefile.MediaFileContentType
-import com.unan.safefile.SafeFile
+import com.lagradost.safefile.MediaFileContentType
+import com.lagradost.safefile.SafeFile
 import okhttp3.internal.closeQuietly
 import java.io.IOException
 import java.io.OutputStream

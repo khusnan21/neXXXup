@@ -174,7 +174,7 @@ import com.unan.nexxxup.utils.USER_SELECTED_HOMEPAGE_API
 import com.unan.nexxxup.utils.setText
 import com.unan.nexxxup.utils.setTextHtml
 import com.unan.nexxxup.utils.txt
-import com.unan.safefile.SafeFile
+import com.lagradost.safefile.SafeFile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
@@ -1459,7 +1459,9 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.PasarBokepProvider().apply { lang = "id" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.Sulasok().apply { lang = "id" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.ThaiPorn().apply { lang = "asia" })
-                    allProviders.add(com.unan.nexxxup.AdultProvider.AnimeSailProvider().apply { lang = "asia" })
+                    allProviders.add(com.unan.nexxxup.AdultProvider.Asian.Jav141Provider().apply { lang = "asia" })
+                    allProviders.add(com.unan.nexxxup.AdultProvider.Asian.UncenXProvider().apply { lang = "asia" })
+                    allProviders.add(com.unan.nexxxup.AdultProvider.Asian.Jav98Provider().apply { lang = "asia" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.Javbangers().apply { lang = "asia" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.JavriderId().apply { lang = "asia" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.JavHeyProvider().apply { lang = "asia" })

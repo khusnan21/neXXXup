@@ -2,7 +2,7 @@ package com.unan.nexxxup.network
 
 import com.unan.nexxxup.mvvm.debugException
 import com.unan.nexxxup.mvvm.logError
-import com.unan.nicehttp.requestCreator
+import com.lagradost.nicehttp.requestCreator
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response

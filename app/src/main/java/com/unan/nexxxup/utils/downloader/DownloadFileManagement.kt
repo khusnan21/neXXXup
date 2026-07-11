@@ -8,8 +8,8 @@ import com.unan.nexxxup.R
 import com.unan.nexxxup.TvType
 import com.unan.nexxxup.getFolderPrefix
 import com.unan.nexxxup.isEpisodeBased
-import com.unan.safefile.MediaFileContentType
-import com.unan.safefile.SafeFile
+import com.lagradost.safefile.MediaFileContentType
+import com.lagradost.safefile.SafeFile
 
 object DownloadFileManagement {
     private const val RESERVED_CHARS = "|\\?*<\":>+[]/\'"

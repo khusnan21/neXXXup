@@ -84,8 +84,8 @@ import com.unan.nexxxup.utils.downloader.DownloadUtils.getEstimatedTimeLeft
 import com.unan.nexxxup.utils.downloader.DownloadUtils.getImageBitmapFromUrl
 import com.unan.nexxxup.utils.downloader.DownloadUtils.join
 import com.unan.nexxxup.utils.txt
-import com.unan.safefile.SafeFile
-import com.unan.safefile.closeQuietly
+import com.lagradost.safefile.SafeFile
+import com.lagradost.safefile.closeQuietly
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

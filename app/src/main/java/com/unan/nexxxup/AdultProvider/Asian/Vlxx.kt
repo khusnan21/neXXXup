@@ -12,7 +12,7 @@ import com.unan.nexxxup.utils.ExtractorLink
 import com.unan.nexxxup.utils.ExtractorLinkType
 import com.unan.nexxxup.utils.getQualityFromName
 import com.unan.nexxxup.utils.newExtractorLink
-import com.unan.nicehttp.NiceResponse
+import com.lagradost.nicehttp.NiceResponse
 
 class Vlxx : MainAPI() {
     private val DEV = "DevDebug"

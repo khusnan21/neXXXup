@@ -21,7 +21,7 @@ import com.unan.nexxxup.utils.Coroutines.mainWork
 import com.unan.nexxxup.utils.Coroutines.threadSafeListOf
 import com.unan.nexxxup.utils.SubtitleHelper.fromCodeToLangTagIETF
 import com.unan.nexxxup.utils.SubtitleHelper.fromLanguageToTagIETF
-import com.unan.nicehttp.RequestBodyTypes
+import com.lagradost.nicehttp.RequestBodyTypes
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody

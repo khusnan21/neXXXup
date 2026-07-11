@@ -2,7 +2,7 @@ package com.unan.nexxxup.utils
 
 import com.unan.nexxxup.app
 import com.unan.nexxxup.base64Decode
-import com.unan.nicehttp.NiceResponse
+import com.lagradost.nicehttp.NiceResponse
 import java.net.URI
 import java.net.URLDecoder
 

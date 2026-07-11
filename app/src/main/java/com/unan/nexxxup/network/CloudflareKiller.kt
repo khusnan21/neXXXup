@@ -6,8 +6,8 @@ import androidx.annotation.AnyThread
 import com.unan.nexxxup.app
 import com.unan.nexxxup.mvvm.debugWarning
 import com.unan.nexxxup.mvvm.safe
-import com.unan.nicehttp.Requests.Companion.await
-import com.unan.nicehttp.cookies
+import com.lagradost.nicehttp.Requests.Companion.await
+import com.lagradost.nicehttp.cookies
 import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
 import okhttp3.Interceptor

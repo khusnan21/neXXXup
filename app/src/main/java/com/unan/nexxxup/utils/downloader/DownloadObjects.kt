@@ -8,7 +8,7 @@ import com.unan.nexxxup.services.DownloadQueueService
 import com.unan.nexxxup.ui.player.SubtitleData
 import com.unan.nexxxup.ui.result.ResultEpisode
 import com.unan.nexxxup.utils.ExtractorLink
-import com.unan.safefile.SafeFile
+import com.lagradost.safefile.SafeFile
 import java.io.IOException
 import java.io.OutputStream
 import java.util.Objects

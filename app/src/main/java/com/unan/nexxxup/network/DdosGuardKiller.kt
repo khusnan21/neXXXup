@@ -2,8 +2,8 @@ package com.unan.nexxxup.network
 
 import androidx.annotation.AnyThread
 import com.unan.nexxxup.app
-import com.unan.nicehttp.Requests
-import com.unan.nicehttp.cookies
+import com.lagradost.nicehttp.Requests
+import com.lagradost.nicehttp.cookies
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request

@@ -10,7 +10,7 @@ import com.unan.nexxxup.actions.temp.NexxxupPackage
 import com.unan.nexxxup.utils.AppUtils.tryParseJson
 import com.unan.nexxxup.utils.DataStoreHelper
 import com.unan.nexxxup.utils.UIHelper.navigate
-import com.unan.safefile.SafeFile
+import com.lagradost.safefile.SafeFile
 
 object OfflinePlaybackHelper {
     fun playLink(activity: Activity, url: String) {

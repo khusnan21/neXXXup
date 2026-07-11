@@ -15,7 +15,7 @@ import com.unan.nexxxup.mvvm.safe
 import com.unan.nexxxup.utils.Coroutines.main
 import com.unan.nexxxup.utils.Coroutines.mainWork
 import com.unan.nexxxup.utils.Coroutines.threadSafeListOf
-import com.unan.nicehttp.requestCreator
+import com.lagradost.nicehttp.requestCreator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

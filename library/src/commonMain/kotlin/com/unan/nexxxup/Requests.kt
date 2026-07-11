@@ -3,8 +3,8 @@ package com.unan.nexxxup
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.unan.nicehttp.Requests
-import com.unan.nicehttp.ResponseParser
+import com.lagradost.nicehttp.Requests
+import com.lagradost.nicehttp.ResponseParser
 import kotlin.reflect.KClass
 
 // Short name for requests client to make it nicer to use

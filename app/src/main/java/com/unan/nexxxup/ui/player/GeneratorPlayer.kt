@@ -122,7 +122,7 @@ import com.unan.nexxxup.utils.UIHelper.toPx
 import com.unan.nexxxup.utils.downloader.DownloadUtils.getImageBitmapFromUrl
 import com.unan.nexxxup.utils.setText
 import com.unan.nexxxup.utils.txt
-import com.unan.safefile.SafeFile
+import com.lagradost.safefile.SafeFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

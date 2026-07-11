@@ -3,7 +3,7 @@ package com.unan.nexxxup.ui.search
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.unan.nexxxup.app
 import com.unan.nexxxup.mvvm.logError
-import com.unan.nicehttp.NiceResponse
+import com.lagradost.nicehttp.NiceResponse
 
 /**
  * API for fetching search suggestions from external sources.
