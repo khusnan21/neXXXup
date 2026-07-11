@@ -1459,6 +1459,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.PasarBokepProvider().apply { lang = "id" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.Sulasok().apply { lang = "id" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.ThaiPorn().apply { lang = "asia" })
+                    allProviders.add(com.unan.nexxxup.AdultProvider.AnimeSailProvider().apply { lang = "asia" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.Javbangers().apply { lang = "asia" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.JavriderId().apply { lang = "asia" })
                     allProviders.add(com.unan.nexxxup.AdultProvider.Asian.JavHeyProvider().apply { lang = "asia" })
