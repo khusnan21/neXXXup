@@ -17,5 +17,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Nexxxup"
+rootProject.name = "CloudStream"
 include(":app", ":library", ":docs")

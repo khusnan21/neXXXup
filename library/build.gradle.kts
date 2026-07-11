@@ -47,8 +47,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
-                optIn("com.unan.nexxxup.InternalAPI")
-                optIn("com.unan.nexxxup.Prerelease")
+                optIn("com.lagradost.cloudstream3.InternalAPI")
+                optIn("com.lagradost.cloudstream3.Prerelease")
             }
         }
 
@@ -72,7 +72,7 @@ tasks.withType<KotlinJvmCompile> {
 }
 
 buildkonfig {
-    packageName = "com.unan.api"
+    packageName = "com.lagradost.api"
     exposeObjectWithName = "BuildConfig"
 
     defaultConfigs {

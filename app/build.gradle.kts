@@ -60,7 +60,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.unan.nexxxup"
+        applicationId = "com.lagradost.cloudstream3"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 68
@@ -134,7 +134,7 @@ android {
         }
     }
 
-    namespace = "com.unan.nexxxup"
+    namespace = "com.lagradost.cloudstream3"
 }
 
 dependencies {
@@ -213,7 +213,7 @@ tasks.register<Jar>("androidSourcesJar") {
 tasks.register<Copy>("copyJar") {
     dependsOn("build", ":library:jvmJar")
     from(
-        "build/intermediates/compile_app_classes_jar/debug/bundleDebugClassesToCompileJar",
+        "build/intermediates/compile_app_classes_jar/stableDebug/bundleStableDebugClassesToCompileJar",
         "../library/build/libs"
     )
     into("build/app-classes")
@@ -241,8 +241,8 @@ tasks.withType<KotlinJvmCompile> {
         jvmDefault.set(JvmDefaultMode.ENABLE)
         freeCompilerArgs.add("-Xannotation-default-target=param-property")
         optIn.addAll(
-            "com.unan.nexxxup.InternalAPI",
-            "com.unan.nexxxup.Prerelease",
+            "com.lagradost.cloudstream3.InternalAPI",
+            "com.lagradost.cloudstream3.Prerelease",
         )
     }
 }

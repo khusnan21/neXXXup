@@ -9,5 +9,5 @@ dependencies {
 }
 
 dokka {
-    moduleName = "Nexxxup"
+    moduleName = "Cloudstream"
 }
