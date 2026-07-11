@@ -72,7 +72,7 @@ tasks.withType<KotlinJvmCompile> {
 }
 
 buildkonfig {
-    packageName = "com.lagradost.api"
+    packageName = "com.unan.api"
     exposeObjectWithName = "BuildConfig"
 
     defaultConfigs {

@@ -14,12 +14,10 @@ open class OkRuHTTP : Odnoklassniki() {
     override var mainUrl = "http://ok.ru"
 }
 
-@Prerelease
 class OkRuSSLMobile : OkRuSSL() {
     override var mainUrl = "https://m.ok.ru"
 }
 
-@Prerelease
 class OkRuHTTPMobile : OkRuHTTP() {
     override var mainUrl = "http://m.ok.ru"
 }

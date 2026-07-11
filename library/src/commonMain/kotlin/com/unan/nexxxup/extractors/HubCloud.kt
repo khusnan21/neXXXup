@@ -12,7 +12,6 @@ import com.unan.nexxxup.utils.loadExtractor
 import com.unan.nexxxup.utils.newExtractorLink
 import java.net.URI
 
-@Prerelease
 class HubCloud : ExtractorApi() {
     override val name = "Hub-Cloud"
     override val mainUrl = "https://hubcloud.*"

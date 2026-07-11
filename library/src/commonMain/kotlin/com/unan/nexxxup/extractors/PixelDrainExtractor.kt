@@ -5,7 +5,6 @@ package com.unan.nexxxup.extractors
 import com.unan.nexxxup.*
 import com.unan.nexxxup.utils.*
 
-@Prerelease
 class PixelDrainDev : PixelDrain() {
     override var mainUrl = "https://pixeldrain.dev"
 }

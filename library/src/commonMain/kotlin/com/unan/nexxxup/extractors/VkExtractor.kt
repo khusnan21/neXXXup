@@ -10,7 +10,6 @@ import com.unan.nexxxup.utils.ExtractorLinkType
 import com.unan.nexxxup.utils.getQualityFromName
 import com.unan.nexxxup.utils.newExtractorLink
 
-@Prerelease
 open class VkExtractor : ExtractorApi() {
     override val name = "Vk"
     override val mainUrl = "https://vkvideo.ru"
