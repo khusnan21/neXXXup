@@ -17,7 +17,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import androidx.recyclerview.widget.RecyclerView
-import com.unan.nexxxup.NexxxupApp.Companion.openBrowser
+import com.unan.nexxxup.CloudStreamApp.Companion.openBrowser
 import com.unan.nexxxup.CommonActivity.onDialogDismissedEvent
 import com.unan.nexxxup.CommonActivity.showToast
 import com.unan.nexxxup.ErrorLoadingException
@@ -41,6 +41,7 @@ import com.unan.nexxxup.ui.settings.Globals.PHONE
 import com.unan.nexxxup.ui.settings.Globals.isLayout
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.getPref
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.hideOn
+import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.setPaddingBottom
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.setToolBarScrollFlags
 import com.unan.nexxxup.ui.settings.SettingsFragment.Companion.setUpToolbar
 import com.unan.nexxxup.utils.AppContextUtils.html
@@ -62,7 +63,7 @@ import com.unan.nexxxup.utils.setText
 import com.unan.nexxxup.utils.txt
 import qrcode.QRCode
 
-class SettingsAccount : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout.fragment_settings_account), BiometricCallback {
+class SettingsAccount : BasePreferenceFragmentCompat(), BiometricCallback {
     companion object {
         /** Used by nginx plugin too */
         @SuppressLint("StringFormatInvalid")
@@ -403,7 +404,7 @@ class SettingsAccount : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout
         PreferenceManager.getDefaultSharedPreferences(context ?: return).edit {
             putBoolean(biometricKey, enabled)
         }
-        view?.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_biometric_key)?.isChecked = enabled
+        findPreference<SwitchPreference>(biometricKey)?.isChecked = enabled
     }
 
     override fun onAuthenticationError() {
@@ -426,49 +427,23 @@ class SettingsAccount : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpToolbar(R.string.category_account)
-        
+        setPaddingBottom()
         setToolBarScrollFlags()
-
-        val settingsManager = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-        view.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(com.unan.nexxxup.R.id.switch_skip_startup_account_select_key)?.let { switch ->
-            switch.isChecked = settingsManager.getBoolean(getString(com.unan.nexxxup.R.string.skip_startup_account_select_key), false)
-            switch.setOnCheckedChangeListener { _, isChecked ->
-                settingsManager.edit { putBoolean(getString(com.unan.nexxxup.R.string.skip_startup_account_select_key), isChecked) }
-                // Emulate preference click
-                val pref = androidx.preference.SwitchPreference(requireContext()).apply { this.key = getString(com.unan.nexxxup.R.string.skip_startup_account_select_key) }
-                // We rely on the rest of the KT file matching "getPref" and attaching listeners. We must patch "getPref" calls!
-            }
-        }
-
-        view.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(com.unan.nexxxup.R.id.switch_biometric_key)?.let { switch ->
-            switch.isChecked = settingsManager.getBoolean(getString(com.unan.nexxxup.R.string.biometric_key), false)
-            switch.setOnCheckedChangeListener { _, isChecked ->
-                settingsManager.edit { putBoolean(getString(com.unan.nexxxup.R.string.biometric_key), isChecked) }
-                // Emulate preference click
-                val pref = androidx.preference.SwitchPreference(requireContext()).apply { this.key = getString(com.unan.nexxxup.R.string.biometric_key) }
-                // We rely on the rest of the KT file matching "getPref" and attaching listeners. We must patch "getPref" calls!
-            }
-        }
-
-        bindPreferences(view)
-
     }
 
-    fun bindPreferences(view: android.view.View) {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         hideKeyboard()
-        
+        setPreferencesFromResource(R.xml.settings_account, rootKey)
 
         //Hides the security  category on TV as it's only Biometric for now
-        // if (com.unan.nexxxup.ui.settings.Globals.isLayout(TV or EMULATOR)) view.findViewById<android.view.View>(R.id.btn_pref_category_security_key)?.visibility = android.view.View.GONE
+        getPref(R.string.pref_category_security_key)?.hideOn(TV or EMULATOR)
 
-        if (com.unan.nexxxup.ui.settings.Globals.isLayout(TV or EMULATOR)) view.findViewById<android.view.View>(R.id.btn_biometric_key)?.visibility = android.view.View.GONE
-        view.findViewById<android.view.View>(R.id.btn_biometric_key)?.setOnClickListener {
-            val ctx = context ?: return@setOnClickListener
+        getPref(R.string.biometric_key)?.hideOn(TV or EMULATOR)?.setOnPreferenceClickListener {
+            val ctx = context ?: return@setOnPreferenceClickListener false
 
             if (deviceHasPasswordPinLock(ctx)) {
                 startBiometricAuthentication(
-                    activity ?: return@setOnClickListener,
+                    activity ?: return@setOnPreferenceClickListener false,
                     R.string.biometric_authentication_title,
                     false
                 )
@@ -488,10 +463,10 @@ class SettingsAccount : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout
             )
 
         for ((key, api) in syncApis) {
-            view.findViewById<android.view.View>(if (key == R.string.opensubtitles_key) R.id.btn_opensubtitles_key else R.id.btn_subdl_key)?.apply {
-                // title = api.name
-                setOnClickListener {
-                    val activity = activity ?: return@setOnClickListener
+            getPref(key)?.apply {
+                title = api.name
+                setOnPreferenceClickListener {
+                    val activity = activity ?: return@setOnPreferenceClickListener false
                     val info = api.authUser()
                     val index = api.accounts.indexOfFirst { account -> account.user.id == info?.id }
                     if (api.accounts.isNotEmpty()) {
@@ -499,6 +474,7 @@ class SettingsAccount : androidx.fragment.app.Fragment(com.unan.nexxxup.R.layout
                     } else {
                         addAccount(activity, api)
                     }
+                    return@setOnPreferenceClickListener true
                 }
             }
         }
