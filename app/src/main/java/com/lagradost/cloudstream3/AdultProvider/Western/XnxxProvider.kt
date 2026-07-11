@@ -130,7 +130,8 @@ class XnxxProvider : MainAPI() {
 
     override suspend fun search(query: String): List<SearchResponse>? { 
         val searchUrl = if (query.startsWith("http")) query else "$mainUrl/search/$query"
-        val videoList = fetchSectionVideos(searchUrl) 
+        val document = app.get(searchUrl).document
+        val videoList = document.select("div.mozaique div.thumb-block").mapNotNull { it.toSearchResponse() }
         return if (videoList.isEmpty()) {
             null 
         } else {
