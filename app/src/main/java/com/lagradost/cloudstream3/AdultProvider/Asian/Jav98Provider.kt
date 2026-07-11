@@ -129,7 +129,7 @@ class Jav98Provider : MainAPI() {
             magnetUrl = magnetUrl.replace("&amp;amp;", "&").replace("&amp;", "&")
             
             callback.invoke(
-                ExtractorLink(source = this.name, name = name, url = magnetUrl, referer = "", quality = 0, type = com.lagradost.cloudstream3.utils.ExtractorLinkType.VIDEO)
+                ExtractorLink(source = this.name, name = name, url = magnetUrl, referer = "", quality = 0, type = com.lagradost.cloudstream3.utils.ExtractorLinkType.MAGNET)
             )
         }
         return true

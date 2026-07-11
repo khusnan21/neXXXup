@@ -170,7 +170,7 @@ class OneJavProvider : MainAPI() {
                         source = this.name,
                         name = linkName,
                         url = href,
-                        type = ExtractorLinkType.VIDEO
+                        type = ExtractorLinkType.MAGNET
                     ) {
                         this.quality = Qualities.Unknown.value
                     }
@@ -182,7 +182,7 @@ class OneJavProvider : MainAPI() {
                         source = this.name,
                         name = linkName,
                         url = fixUrl(href),
-                        type = ExtractorLinkType.VIDEO
+                        type = ExtractorLinkType.TORRENT
                     ) {
                         this.quality = Qualities.Unknown.value
                     }
