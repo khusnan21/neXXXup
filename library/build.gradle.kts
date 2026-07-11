@@ -47,8 +47,8 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
-                optIn("com.lagradost.cloudstream3.InternalAPI")
-                optIn("com.lagradost.cloudstream3.Prerelease")
+                optIn("com.unan.nexxxup.InternalAPI")
+                optIn("com.unan.nexxxup.Prerelease")
             }
         }
 
