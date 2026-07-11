@@ -1514,6 +1514,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener, BiometricCa
                     allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.Wumaobi().apply { lang = "asia" })
                     allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.XChina().apply { lang = "asia" })
                     allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.Jav141Provider().apply { lang = "asia" })
+                    allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.JavNinja().apply { lang = "asia" })
                     allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.Jav98Provider().apply { lang = "asia" })
                     allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.UncenXProvider().apply { lang = "asia" })
                     allProviders.add(com.lagradost.cloudstream3.AdultProvider.Asian.XPrimeHub().apply { lang = "asia" })
