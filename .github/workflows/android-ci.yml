@@ -1,10 +1,6 @@
 name: Android Release
 
 on:
-  push:
-    branches: [ "master", "main" ]
-  pull_request:
-    branches: [ "master", "main" ]
   workflow_dispatch:
 
 jobs:
@@ -36,7 +32,7 @@ jobs:
         mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/neXXXup-4.7.0.apk
 
     - name: Upload APK to Release
-      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+      if: github.event_name == 'workflow_dispatch'
       uses: ncipollo/release-action@v1
       with:
         artifacts: "app/build/outputs/apk/release/neXXXup-4.7.0.apk"
