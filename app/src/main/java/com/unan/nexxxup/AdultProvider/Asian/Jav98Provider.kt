@@ -12,7 +12,6 @@ import com.unan.nexxxup.newHomePageResponse
 import com.unan.nexxxup.newMovieLoadResponse
 import com.unan.nexxxup.newMovieSearchResponse
 import com.unan.nexxxup.utils.ExtractorLink
-import com.unan.nexxxup.utils.newExtractorLink
 import com.unan.nexxxup.mainPageOf
 import org.jsoup.nodes.Document
 
@@ -130,7 +129,7 @@ class Jav98Provider : MainAPI() {
             magnetUrl = magnetUrl.replace("&amp;", "&")
             
             callback.invoke(
-                newExtractorLink(source = this.name, name = name, url = magnetUrl, type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
+                ExtractorLink(source = this.name, name = name, url = magnetUrl, referer = "", quality = 0, type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
             )
         }
         return true

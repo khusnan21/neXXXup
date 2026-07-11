@@ -12,7 +12,6 @@ import com.unan.nexxxup.newHomePageResponse
 import com.unan.nexxxup.newMovieLoadResponse
 import com.unan.nexxxup.newMovieSearchResponse
 import com.unan.nexxxup.utils.ExtractorLink
-import com.unan.nexxxup.utils.newExtractorLink
 import com.unan.nexxxup.mainPageOf
 import org.json.JSONObject
 
@@ -128,16 +127,11 @@ class UncenXProvider : MainAPI() {
         
         if (m3u8Match != null) {
             callback.invoke(
-                newExtractorLink(
-                    source = name,
-                    name = "HLS",
-                    url = m3u8Match.groupValues[1],
-                    type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO
-                )
+                ExtractorLink(source = name, name = "HLS", url = m3u8Match.groupValues[1], referer = "", quality = 0, type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
             )
         } else if (mp4Match != null) {
             callback.invoke(
-                newExtractorLink(source = name, name = "MP4", url = mp4Match.groupValues[1], type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
+                ExtractorLink(source = name, name = "MP4", url = mp4Match.groupValues[1], referer = "", quality = 0, type = com.unan.nexxxup.utils.ExtractorLinkType.VIDEO)
             )
         }
         
