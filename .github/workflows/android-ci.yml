@@ -28,35 +28,18 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x gradlew
 
-    - name: Generate debug.keystore
-      run: |
-        mkdir -p ~/.android
-        if [ -f "debug.keystore.base64" ]; then
-          echo "Decoding debug.keystore.base64 to root and ~/.android/..."
-          base64 -d debug.keystore.base64 > debug.keystore
-          cp debug.keystore ~/.android/debug.keystore
-        elif [ -n "${{ secrets.DEBUG_KEYSTORE_BASE64 }}" ]; then
-          echo "Decoding DEBUG_KEYSTORE_BASE64 secret to root and ~/.android/..."
-          echo "${{ secrets.DEBUG_KEYSTORE_BASE64 }}" | base64 --decode > debug.keystore
-          cp debug.keystore ~/.android/debug.keystore
-        else
-          echo "Generating new debug.keystore using keytool..."
-          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-          cp debug.keystore ~/.android/debug.keystore
-        fi
-
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
 
     - name: Rename APK
       run: |
-        mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/neXXXup-4.7.0.apk
+        mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/neXXXup-4.7.0.apk
 
     - name: Upload APK to Release
       if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "app/build/outputs/apk/debug/neXXXup-4.7.0.apk"
+        artifacts: "app/build/outputs/apk/release/neXXXup-4.7.0.apk"
         tag: "latest"
         name: "neXXXup 4.7.0"
         body: "Latest build of neXXXup."

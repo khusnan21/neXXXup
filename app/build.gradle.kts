@@ -53,8 +53,12 @@ android {
     }
 
     signingConfigs {
-        // We just use SIGNING_KEY_ALIAS here since it won't change
-        // so won't kill the configuration cache.
+        create("release") {
+            storeFile = rootProject.file("unan.keystore")
+            storePassword = "galur1234"
+            keyAlias = "unan"
+            keyPassword = "galur1234"
+        }
     }
 
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -89,6 +93,10 @@ android {
             "\"" + (System.getenv("SIMKL_CLIENT_SECRET") ?: localProperties["simkl.secret"]) + "\""
         )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters.add("arm64-v8a")
+        }
     }
 
     buildTypes {
@@ -100,6 +108,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
