@@ -40,17 +40,24 @@ class Jav98Provider : MainAPI() {
             val fullUrl = mainUrl + href
             if (!addedUrls.add(fullUrl)) continue
             
-            val imgEl = el.selectFirst("img")
-            if (imgEl != null) {
-                val posterUrl = imgEl.attr("src")
-                val name = el.attr("title").takeIf { it.isNotEmpty() } ?: imgEl.attr("alt").takeIf { it.isNotEmpty() } ?: "Video"
-                
-                items.add(
-                    newMovieSearchResponse(name, fullUrl, TvType.NSFW) {
-                        this.posterUrl = posterUrl
-                    }
-                )
+            // Extract title
+            val titleEl = el.selectFirst(".work-title")
+            val name = titleEl?.attr("title")?.takeIf { it.isNotEmpty() } 
+                ?: titleEl?.text()?.trim()?.takeIf { it.isNotEmpty() } 
+                ?: "Video"
+            
+            // Extract poster from URL ID (e.g., /v/549724/snos-258 -> 549724)
+            val urlId = href.split("/").getOrNull(2)
+            var posterUrl = el.selectFirst("img.work-cover")?.attr("src")
+            if (posterUrl.isNullOrEmpty() && urlId != null && urlId.toIntOrNull() != null) {
+                posterUrl = "https://img.j-cdn.com/work/$urlId.jpg"
             }
+            
+            items.add(
+                newMovieSearchResponse(name, fullUrl, TvType.NSFW) {
+                    this.posterUrl = posterUrl
+                }
+            )
         }
         val hasNext = doc.html().contains("下一页") // "Next page" in Chinese, or check if page=X exists, handled simply below
         return Pair(items, true)
