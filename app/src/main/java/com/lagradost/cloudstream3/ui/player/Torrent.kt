@@ -368,11 +368,14 @@ object Torrent {
         var trackers: List<String>?,
     ) {
         fun streamUrl(url: String): String {
-            val fileName =
-                this.fileStats?.first { !it.path.isNullOrBlank() }?.path
-                    ?: throw ErrorLoadingException("Null path")
-
-            val index = url.substringAfter("index=").substringBefore("&").toIntOrNull() ?: 0
+            // Prioritize the largest file (usually the main video) instead of the first file
+            val fileStat = this.fileStats?.filter { !it.path.isNullOrBlank() }
+                ?.maxByOrNull { it.length ?: 0L }
+                ?: throw ErrorLoadingException("No valid files found in torrent")
+            
+            val fileName = fileStat.path!!
+            
+            val index = fileStat.id ?: (url.substringAfter("index=").substringBefore("&").toIntOrNull() ?: 0)
 
             //  https://github.com/Diegopyl1209/torrentserver-aniyomi/blob/c18f58e51b6738f053261bc863177078aa9c1c98/web/api/stream.go#L18
             return "$TORRENT_SERVER_URL/stream/${

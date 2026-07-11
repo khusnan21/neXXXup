@@ -22,7 +22,8 @@ import com.lagradost.cloudstream3.utils.Coroutines.main
 import com.lagradost.cloudstream3.utils.DataStoreHelper
 import com.lagradost.cloudstream3.utils.UIHelper.fixSystemBarsPadding
 import com.lagradost.cloudstream3.utils.UIHelper.hideKeyboard
-
+import com.lagradost.cloudstream3.utils.ImageLoader.loadImage
+import com.lagradost.cloudstream3.utils.getImageFromDrawable
 class DiscoverFragment : BaseFragment<FragmentDiscoverBinding>(
     BaseFragment.BindingCreator.Bind(FragmentDiscoverBinding::bind)
 ) {
@@ -37,12 +38,30 @@ class DiscoverFragment : BaseFragment<FragmentDiscoverBinding>(
             val urlText: android.widget.TextView = view.findViewById(R.id.provider_url)
             val langBadge: android.widget.TextView = view.findViewById(R.id.provider_lang_badge)
             val adultBadge: android.widget.TextView = view.findViewById(R.id.provider_adult_badge)
+            val providerIcon: android.widget.ImageView = view.findViewById(R.id.provider_icon)
             val card: android.view.View = view
             
             fun bind(api: com.lagradost.cloudstream3.MainAPI) {
-                nameText.text = api.name
-                urlText.text = api.mainUrl.substringAfter("://")
+                nameText.text = api.name.removeSuffix("Provider")
+                urlText.visibility = View.GONE
                 langBadge.text = api.lang
+
+                val localPlugin = com.lagradost.cloudstream3.plugins.PluginManager.getPluginsLocal().find {
+                    it.internalName == api.name || it.internalName == api.name.removeSuffix("Provider")
+                }
+                val iconUrl = localPlugin?.iconUrl
+                if (!iconUrl.isNullOrEmpty()) {
+                    providerIcon.imageTintList = null
+                    providerIcon.loadImage(iconUrl) {
+                        error {
+                            providerIcon.imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#8B5CF6"))
+                            getImageFromDrawable(view.context, R.drawable.ic_baseline_extension_24)
+                        }
+                    }
+                } else {
+                    providerIcon.imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#8B5CF6"))
+                    providerIcon.setImageResource(R.drawable.ic_baseline_extension_24)
+                }
 
                 if (api.supportedTypes.contains(com.lagradost.cloudstream3.TvType.NSFW)) {
                     adultBadge.visibility = View.VISIBLE

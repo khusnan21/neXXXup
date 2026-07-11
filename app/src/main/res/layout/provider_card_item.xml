@@ -1,54 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="?attr/primaryGrayBackground"
+    app:cardBackgroundColor="?attr/boxItemBackground"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="12dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+
+            <ImageView
+                android:id="@+id/provider_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_baseline_extension_24" />
+
+            <!-- Badge container aligned to the right -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/provider_adult_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/badge_adult"
+                    android:backgroundTint="#2FFF3B30"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="1.5dp"
+                    android:text="18+"
+                    android:textColor="#FF453A"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/provider_lang_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_lang"
+                    android:backgroundTint="#1F0A84FF"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="1.5dp"
+                    android:text="EN"
+                    android:textColor="#0A84FF"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/provider_name"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="Provider Name"
             android:textColor="?attr/textColor"
             android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/google_sans"
             android:maxLines="1"
             android:ellipsize="end" />
 
         <TextView
-            android:id="@+id/provider_adult_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/provider_lang_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-
-        <TextView
             android:id="@+id/provider_url"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:layout_marginTop="2dp"
+            android:text="provider.com"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp"
+            android:fontFamily="@font/google_sans"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/textColorSecondary"
-        android:alpha="0.10" />
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>
