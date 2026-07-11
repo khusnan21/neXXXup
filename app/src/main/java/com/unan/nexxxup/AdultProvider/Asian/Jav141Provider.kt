@@ -12,6 +12,9 @@ import com.unan.nexxxup.newHomePageResponse
 import com.unan.nexxxup.newMovieLoadResponse
 import com.unan.nexxxup.newMovieSearchResponse
 import com.unan.nexxxup.utils.ExtractorLink
+import com.unan.nexxxup.utils.newExtractorLink
+import com.unan.nexxxup.mainPageOf
+import com.unan.nexxxup.fixUrl
 import org.jsoup.nodes.Element
 
 class Jav141Provider : MainAPI() {
@@ -122,7 +125,7 @@ class Jav141Provider : MainAPI() {
                 var linkName = a.text().trim()
                 if (linkName.isEmpty()) linkName = "Magnet"
                 callback.invoke(
-                    ExtractorLink(
+                    newExtractorLink(
                         name,
                         linkName,
                         href,
@@ -131,11 +134,11 @@ class Jav141Provider : MainAPI() {
                         false
                     )
                 )
-            } else if (href.toLowerCase().endsWith(".torrent")) {
+            } else if (href.lowercase().endsWith(".torrent")) {
                 var linkName = a.text().trim()
                 if (linkName.isEmpty()) linkName = "Torrent"
                 callback.invoke(
-                    ExtractorLink(
+                    newExtractorLink(
                         name,
                         linkName,
                         fixUrl(href),
