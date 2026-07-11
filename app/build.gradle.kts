@@ -213,7 +213,7 @@ tasks.register<Jar>("androidSourcesJar") {
 tasks.register<Copy>("copyJar") {
     dependsOn("build", ":library:jvmJar")
     from(
-        "build/intermediates/compile_app_classes_jar/stableDebug/bundleStableDebugClassesToCompileJar",
+        "build/intermediates/compile_app_classes_jar/debug/bundleDebugClassesToCompileJar",
         "../library/build/libs"
     )
     into("build/app-classes")

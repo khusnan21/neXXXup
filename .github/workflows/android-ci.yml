@@ -46,17 +46,17 @@ jobs:
         fi
 
     - name: Build with Gradle
-      run: ./gradlew assembleStableDebug
+      run: ./gradlew assembleDebug
 
     - name: Rename APK
       run: |
-        mv app/build/outputs/apk/stable/debug/app-stable-debug.apk app/build/outputs/apk/stable/debug/neXXXup-4.7.0.apk
+        mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/neXXXup-4.7.0.apk
 
     - name: Upload APK to Release
       if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "app/build/outputs/apk/stable/debug/neXXXup-4.7.0.apk"
+        artifacts: "app/build/outputs/apk/debug/neXXXup-4.7.0.apk"
         tag: "latest"
         name: "neXXXup 4.7.0"
         body: "Latest build of neXXXup."
