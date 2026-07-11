@@ -74,109 +74,25 @@ class XnxxProvider : MainAPI() {
         @JsonProperty("w") val weight: Int? = null
     )
 
-    private suspend fun fetchSectionVideos(sectionUrl: String, maxItems: Int = Int.MAX_VALUE): List<SearchResponse> {
-        if (!sectionUrl.startsWith("http")) {
-            return emptyList()
-        }
-        val videoList = mutableListOf<SearchResponse>()
-        try {
-            val document = app.get(sectionUrl).document 
-            val videoElements = document.select("div.mozaique div.thumb-block")
-            videoElements.take(maxItems).mapNotNullTo(videoList) { it.toSearchResponse() }
-        } catch (e: Exception) {
-            System.err.println("TxnhhProvider ERROR: Failed to fetch/parse section $sectionUrl. Error: ${e.message}")
-        }
-        return videoList
-    }
+    override val mainPage = mainPageOf(
+        "$mainUrl/featured" to "Featured",
+        "$mainUrl/search/pink" to "Pink Favorite",
+        "$mainUrl/search/Teen+blonde" to "Teen Blonde Favorite",
+        "$mainUrl/search/indonesia" to "Indonesia Favorite",
+        "$mainUrl/search/Big+tits" to "Big Tits Favorite",
+        "$mainUrl/amateur" to "Amateur",
+        "$mainUrl/anal" to "Anal",
+        "$mainUrl/asian" to "Asian",
+        "$mainUrl/asian_woman" to "Asian Woman",
+        "$mainUrl/todays-selection" to "Today's Selection"
+    )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val homePageListsResult = ArrayList<HomePageList>()
-        var hasNextMainPage = false 
-
-        if (page == 1) { 
-            val document = app.get(mainUrl).document
-            val scriptElements = document.select("script:containsData(xv.cats.write_thumb_block_list)")
-
-            if (scriptElements.isNotEmpty()) {
-                val scriptContent = scriptElements.html()
-                val regex = Regex("""xv\.cats\.write_thumb_block_list\s*\(\s*(\[(?:.|\n)*?\])\s*,\s*['"]home-cat-list['"]""")
-                val matchResult = regex.find(scriptContent)
-                
-                if (matchResult != null && matchResult.groupValues.size > 1) {
-                    val arrayString = matchResult.groupValues[1].trim() 
-                    if (arrayString.startsWith("[") && arrayString.endsWith("]")) {
-                        try {
-                            val allHomePageItems = AppUtils.parseJson<List<HomePageItem>>(arrayString)
-                            val validSectionsSource = allHomePageItems.mapNotNull { item ->
-                                var currentItemTitle = item.title ?: item.titleFallback 
-                                val itemUrlPart = item.url
-                                
-                                if (itemUrlPart == null) return@mapNotNull null
-                                val itemUrl = if (itemUrlPart.startsWith("/")) mainUrl + itemUrlPart else itemUrlPart
-
-                                if (itemUrlPart == "/todays-selection") {
-                                    currentItemTitle = "Today's Selection" 
-                                } else if (currentItemTitle != null) {
-                                    currentItemTitle = Parser.unescapeEntities(currentItemTitle, false)
-                                }
-
-                                if (currentItemTitle == null) return@mapNotNull null
-
-                                val isGameOrStory = itemUrl.contains("nutaku.net") || itemUrl.contains("sexstories.com")
-                                val isLikelyStaticLink = item.noRotate == true && item.count == "0" && item.tbk == false && 
-                                                         (isGameOrStory || item.url == "/your-suggestions/straight" || item.url == "/tags" || item.url == "/pornstars")
-                                
-                                if (isGameOrStory || isLikelyStaticLink) null
-                                else if (item.type == "cat" || item.type == "search" || item.url == "/todays-selection" || item.url == "/best" || item.url == "/hits" || item.url == "/fresh" || item.url == "/verified/videos" ) Pair(currentItemTitle, itemUrl)
-                                else null
-                            }.distinctBy { it.second } 
-
-                            val sectionsToDisplayThisPage = mutableListOf<Pair<String, String>>()
-                            validSectionsSource.find { it.second.endsWith("/todays-selection") }?.let { 
-                                sectionsToDisplayThisPage.add(it)
-                            }
-                            
-                            val otherSectionsPool = validSectionsSource.filterNot { sectionsToDisplayThisPage.map { sec -> sec.second }.contains(it.second) }.toMutableList()
-                            
-                            val itemsPerHomePage = 5
-                            val randomItemsNeeded = itemsPerHomePage - sectionsToDisplayThisPage.size
-                            
-                            if (randomItemsNeeded > 0 && otherSectionsPool.isNotEmpty()) {
-                                otherSectionsPool.shuffle(Random(System.currentTimeMillis())) 
-                                sectionsToDisplayThisPage.addAll(otherSectionsPool.take(randomItemsNeeded))
-                            }
-                            
-                            if (validSectionsSource.size > itemsPerHomePage && page < 3) { 
-                                hasNextMainPage = true
-                            }
-                            
-                            if (sectionsToDisplayThisPage.isNotEmpty()) {
-                                coroutineScope {
-                                    val deferredLists = sectionsToDisplayThisPage.map { (sectionTitle, sectionUrl) ->
-                                        async {
-                                            val videos = fetchSectionVideos(sectionUrl) 
-                                            if (videos.isNotEmpty()) HomePageList(sectionTitle, videos) else null
-                                        }
-                                    }
-                                    deferredLists.forEach { it?.await()?.let { homePageListsResult.add(it) } }
-                                }
-                            }
-                        } catch (e: Exception) { e.printStackTrace() }
-                    }
-                }
-            }
-        } else if (page > 1) { 
-             hasNextMainPage = false 
-        }
-
-        if (homePageListsResult.isEmpty() && page == 1) {
-            homePageListsResult.add(HomePageList("Default Links (Fallback)", listOf(
-                newMovieSearchResponse(name = "Asian Woman", url = "$mainUrl/search/asian_woman", type = TvType.NSFW) {},
-                newMovieSearchResponse(name = "Today's Selection", url = "$mainUrl/todays-selection", type = TvType.NSFW) {}
-            )))
-            hasNextMainPage = false 
-        }
-        return newHomePageResponse(list = homePageListsResult, hasNext = hasNextMainPage)
+        val url = if (page > 1) "${request.data.removeSuffix("/")}/${page - 1}" else request.data
+        val document = app.get(url).document
+        val items = document.select("div.mozaique div.thumb-block").mapNotNull { it.toSearchResponse() }
+        val hasNext = document.selectFirst("div.pagination a.next") != null
+        return newHomePageResponse(HomePageList(request.name, items), hasNext)
     }
 
     private fun Element.toSearchResponse(): SearchResponse? {

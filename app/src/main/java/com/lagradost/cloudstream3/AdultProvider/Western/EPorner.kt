@@ -18,6 +18,10 @@ class EPorner : MainAPI() {
 
     override val mainPage = mainPageOf(
         "$mainUrl/" to "Most recent",
+        "$mainUrl/tag/pink-pussy/" to "Pink Pussy Favorite",
+        "$mainUrl/tag/big-tits/" to "Big Tits Favorite",
+        "$mainUrl/tag/blonde/" to "Blonde Favorite",
+        "$mainUrl/tag/teen-blonde/" to "Teen Blonde Favorite",
         "$mainUrl/most-viewed/" to "Most viewed",
         "$mainUrl/top-rated/" to "Top rated",
         "$mainUrl/longest/" to "Longest",

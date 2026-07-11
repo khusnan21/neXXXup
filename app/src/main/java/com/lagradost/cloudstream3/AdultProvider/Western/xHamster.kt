@@ -21,6 +21,11 @@ class xHamster : MainAPI() {
 
     override val mainPage = mainPageOf(
         "${mainUrl}/newest/" to "Newest",
+        "${mainUrl}/creators/comatozze" to "Comatozze Favorite",
+        "${mainUrl}/channels/studio-modern-shunga-jav" to "Studio Modern Shunga Favorite",
+        "${mainUrl}/categories/blonde" to "Blonde Favorite",
+        "${mainUrl}/search/blonde" to "Blonde Search Favorite",
+        "${mainUrl}/search/pink+pussy" to "Pink Pussy Favorite",
         "${mainUrl}/most-viewed/weekly/" to "Weekly Most Viewed",
         "${mainUrl}/most-viewed/monthly/" to "Monthly Most Viewed",
         "${mainUrl}/most-viewed/" to "All Time Most Viewed",

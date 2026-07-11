@@ -48,41 +48,42 @@ class xVideos : MainAPI() {
         }
     }
 
+    override val mainPage = mainPageOf(
+        "" to "Videos",
+        "/?k=pink+pussy" to "Pink Pussy",
+        "/?k=Big+tits" to "Big Tits Favorite",
+        "/tags/blonde" to "Blonde",
+        "/?k=Teen+blonde" to "Teen Blonde",
+        "/c/Amateur-65" to "Amateur",
+        "/c/Anal-12" to "Anal",
+        "/c/Big_Tits-23" to "Big Tits",
+        "/c/Big_Cock-34" to "Big Cock",
+        "/c/Big_Ass-24" to "Big Ass",
+        "/c/Creampie-40" to "Creampie",
+        "/c/Milf-19" to "Milf",
+        "/c/Mature-38" to "Mature",
+        "/c/Teen-13" to "Teen",
+        "/c/Interracial-27" to "Interracial",
+        "/c/Lesbian-26" to "Lesbian",
+        "/c/Blowjob-15" to "Blowjob",
+        "/c/Cumshot-18" to "Cumshot",
+        "/c/Redhead-31" to "Redhead",
+        "/c/Brunette-25" to "Brunette"
+    )
+
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
-        val pageNumber = if (page > 1) "/new/${page - 1}" else ""
+        val pageUrl = request.data
+        val pageNumber = if (page > 1) {
+            if (pageUrl.isEmpty()) "/new/${page - 1}" else "$pageUrl/${page - 1}"
+        } else {
+            pageUrl
+        }
+        
         val document = app.get("$mainUrl$pageNumber").document
         val items = document.select("div.mozaique div.thumb-block").mapNotNull { it.toSearchResponse() }
 
-        val homePages = mutableListOf(HomePageList("Videos", items))
-
-        val categories = listOf(
-            Pair("Amateur", "/c/Amateur-65"),
-            Pair("Anal", "/c/Anal-12"),
-            Pair("Big Tits", "/c/Big_Tits-23"),
-            Pair("Big Cock", "/c/Big_Cock-34"),
-            Pair("Big Ass", "/c/Big_Ass-24"),
-            Pair("Creampie", "/c/Creampie-40"),
-            Pair("Milf", "/c/Milf-19"),
-            Pair("Mature", "/c/Mature-38"),
-            Pair("Teen", "/c/Teen-13"),
-            Pair("Interracial", "/c/Interracial-27"),
-            Pair("Lesbian", "/c/Lesbian-26"),
-            Pair("Blowjob", "/c/Blowjob-15"),
-            Pair("Cumshot", "/c/Cumshot-18"),
-            Pair("Redhead", "/c/Redhead-31"),
-            Pair("Brunette", "/c/Brunette-25")
-        )
-
-        categories.forEach { (catName, catHref) ->
-            val catDocs = app.get("$mainUrl$catHref").document
-            val catItems = catDocs.select("div.mozaique div.thumb-block").take(10).mapNotNull { it.toSearchResponse() }
-            if (catItems.isNotEmpty()) {
-                homePages.add(HomePageList(catName, catItems))
-            }
-        }
-
         val hasNextPage = document.selectFirst("div.pagination a.next-page") != null
-        return newHomePageResponse(homePages, hasNextPage)
+        return newHomePageResponse(HomePageList(request.name, items), hasNextPage)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
