@@ -41,7 +41,6 @@ import com.lagradost.cloudstream3.ui.settings.Globals.PHONE
 import com.lagradost.cloudstream3.ui.settings.Globals.isLayout
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.getPref
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.hideOn
-import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setPaddingBottom
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setToolBarScrollFlags
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setUpToolbar
 import com.lagradost.cloudstream3.utils.AppContextUtils.html
@@ -63,7 +62,7 @@ import com.lagradost.cloudstream3.utils.setText
 import com.lagradost.cloudstream3.utils.txt
 import qrcode.QRCode
 
-class SettingsAccount : BasePreferenceFragmentCompat(), BiometricCallback {
+class SettingsAccount : androidx.fragment.app.Fragment(com.lagradost.cloudstream3.R.layout.fragment_settings_account), BiometricCallback {
     companion object {
         /** Used by nginx plugin too */
         @SuppressLint("StringFormatInvalid")
@@ -404,7 +403,7 @@ class SettingsAccount : BasePreferenceFragmentCompat(), BiometricCallback {
         PreferenceManager.getDefaultSharedPreferences(context ?: return).edit {
             putBoolean(biometricKey, enabled)
         }
-        findPreference<SwitchPreference>(biometricKey)?.isChecked = enabled
+        view?.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_biometric_key)?.isChecked = enabled
     }
 
     override fun onAuthenticationError() {
@@ -427,23 +426,49 @@ class SettingsAccount : BasePreferenceFragmentCompat(), BiometricCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpToolbar(R.string.category_account)
-        setPaddingBottom()
+        
         setToolBarScrollFlags()
+
+        val settingsManager = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        view.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(com.lagradost.cloudstream3.R.id.switch_skip_startup_account_select_key)?.let { switch ->
+            switch.isChecked = settingsManager.getBoolean(getString(com.lagradost.cloudstream3.R.string.skip_startup_account_select_key), false)
+            switch.setOnCheckedChangeListener { _, isChecked ->
+                settingsManager.edit { putBoolean(getString(com.lagradost.cloudstream3.R.string.skip_startup_account_select_key), isChecked) }
+                // Emulate preference click
+                val pref = androidx.preference.SwitchPreference(requireContext()).apply { this.key = getString(com.lagradost.cloudstream3.R.string.skip_startup_account_select_key) }
+                // We rely on the rest of the KT file matching "getPref" and attaching listeners. We must patch "getPref" calls!
+            }
+        }
+
+        view.findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(com.lagradost.cloudstream3.R.id.switch_biometric_key)?.let { switch ->
+            switch.isChecked = settingsManager.getBoolean(getString(com.lagradost.cloudstream3.R.string.biometric_key), false)
+            switch.setOnCheckedChangeListener { _, isChecked ->
+                settingsManager.edit { putBoolean(getString(com.lagradost.cloudstream3.R.string.biometric_key), isChecked) }
+                // Emulate preference click
+                val pref = androidx.preference.SwitchPreference(requireContext()).apply { this.key = getString(com.lagradost.cloudstream3.R.string.biometric_key) }
+                // We rely on the rest of the KT file matching "getPref" and attaching listeners. We must patch "getPref" calls!
+            }
+        }
+
+        bindPreferences(view)
+
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    fun bindPreferences(view: android.view.View) {
         hideKeyboard()
-        setPreferencesFromResource(R.xml.settings_account, rootKey)
+        
 
         //Hides the security  category on TV as it's only Biometric for now
-        getPref(R.string.pref_category_security_key)?.hideOn(TV or EMULATOR)
+        // if (com.lagradost.cloudstream3.ui.settings.Globals.isLayout(TV or EMULATOR)) view.findViewById<android.view.View>(R.id.btn_pref_category_security_key)?.visibility = android.view.View.GONE
 
-        getPref(R.string.biometric_key)?.hideOn(TV or EMULATOR)?.setOnPreferenceClickListener {
-            val ctx = context ?: return@setOnPreferenceClickListener false
+        if (com.lagradost.cloudstream3.ui.settings.Globals.isLayout(TV or EMULATOR)) view.findViewById<android.view.View>(R.id.btn_biometric_key)?.visibility = android.view.View.GONE
+        view.findViewById<android.view.View>(R.id.btn_biometric_key)?.setOnClickListener {
+            val ctx = context ?: return@setOnClickListener
 
             if (deviceHasPasswordPinLock(ctx)) {
                 startBiometricAuthentication(
-                    activity ?: return@setOnPreferenceClickListener false,
+                    activity ?: return@setOnClickListener,
                     R.string.biometric_authentication_title,
                     false
                 )
@@ -463,10 +488,10 @@ class SettingsAccount : BasePreferenceFragmentCompat(), BiometricCallback {
             )
 
         for ((key, api) in syncApis) {
-            getPref(key)?.apply {
-                title = api.name
-                setOnPreferenceClickListener {
-                    val activity = activity ?: return@setOnPreferenceClickListener false
+            view.findViewById<android.view.View>(if (key == R.string.opensubtitles_key) R.id.btn_opensubtitles_key else R.id.btn_subdl_key)?.apply {
+                // title = api.name
+                setOnClickListener {
+                    val activity = activity ?: return@setOnClickListener
                     val info = api.authUser()
                     val index = api.accounts.indexOfFirst { account -> account.user.id == info?.id }
                     if (api.accounts.isNotEmpty()) {
@@ -474,7 +499,6 @@ class SettingsAccount : BasePreferenceFragmentCompat(), BiometricCallback {
                     } else {
                         addAccount(activity, api)
                     }
-                    return@setOnPreferenceClickListener true
                 }
             }
         }

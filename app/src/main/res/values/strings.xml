@@ -375,6 +375,17 @@
     <string name="episodes_range">%1$d-%2$d</string>
     <string name="episode_format" formatted="true">%1$d %2$s</string>
     <string name="nsfw">NSFW</string>
+    <string name="type_movie">Movie</string>
+    <string name="type_tvseries">TV Series</string>
+    <string name="type_anime">Anime</string>
+    <string name="type_animemovie">Anime Movie</string>
+    <string name="type_cartoon">Cartoon</string>
+    <string name="type_ova">OVA</string>
+    <string name="type_torrent">Torrent</string>
+    <string name="type_documentary">Documentary</string>
+    <string name="type_asiandrama">Asian Drama</string>
+    <string name="type_live">Live</string>
+    <string name="type_nsfw">NSFW</string>
     <string name="all_adult">All</string>
     <string name="asian_adult">Asian</string>
     <string name="western_adult">Western</string>

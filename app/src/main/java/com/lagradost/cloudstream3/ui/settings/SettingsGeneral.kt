@@ -4,17 +4,20 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
-import androidx.core.os.ConfigurationCompat
+import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.lagradost.cloudstream3.APIHolder.allProviders
 import com.lagradost.cloudstream3.CloudStreamApp
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.getKey
 import com.lagradost.cloudstream3.CloudStreamApp.Companion.setKey
-import com.lagradost.cloudstream3.CommonActivity
 import com.lagradost.cloudstream3.CommonActivity.showToast
 import com.lagradost.cloudstream3.MainActivity
 import com.lagradost.cloudstream3.R
@@ -24,12 +27,6 @@ import com.lagradost.cloudstream3.databinding.AddSiteInputBinding
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.mvvm.safe
 import com.lagradost.cloudstream3.network.initClient
-import com.lagradost.cloudstream3.ui.BasePreferenceFragmentCompat
-import com.lagradost.cloudstream3.ui.settings.Globals.EMULATOR
-import com.lagradost.cloudstream3.ui.settings.Globals.TV
-import com.lagradost.cloudstream3.ui.settings.Globals.beneneCount
-import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.getPref
-import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.hideOn
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setPaddingBottom
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setToolBarScrollFlags
 import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.setUpToolbar
@@ -37,12 +34,10 @@ import com.lagradost.cloudstream3.ui.settings.utils.getChooseFolderLauncher
 import com.lagradost.cloudstream3.utils.BatteryOptimizationChecker.isAppRestricted
 import com.lagradost.cloudstream3.utils.BatteryOptimizationChecker.showBatteryOptimizationDialog
 import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showBottomDialog
-import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showDialog
 import com.lagradost.cloudstream3.utils.SingleSelectionHelper.showMultiDialog
 import com.lagradost.cloudstream3.utils.SubtitleHelper
 import com.lagradost.cloudstream3.utils.UIHelper.dismissSafe
 import com.lagradost.cloudstream3.utils.UIHelper.hideKeyboard
-import com.lagradost.cloudstream3.utils.UIHelper.navigate
 import com.lagradost.cloudstream3.utils.USER_PROVIDER_API
 import com.lagradost.cloudstream3.utils.downloader.DownloadFileManagement
 import com.lagradost.cloudstream3.utils.downloader.DownloadFileManagement.getBasePath
@@ -54,39 +49,18 @@ fun getCurrentLocale(context: Context): String {
     return "in"
 }
 
-/**
- * List of app supported languages.
- * Language code shall be a IETF BCP 47 conformant tag
- *
- * See locales on:
- * https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-core/availableLocales.json
- * https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
- * https://android.googlesource.com/platform/frameworks/base/+/android-16.0.0_r2/core/res/res/values/locale_config.xml
- * https://iso639-3.sil.org/code_tables/639/data/all
-*/
 val appLanguages = arrayListOf(
-    /* begin language list */
     Pair("Bahasa Indonesia", "in"),
-/* end language list */
-).sortedBy { it.first.lowercase(Locale.ROOT) } // ye, we go alphabetical, so ppl don't put their lang on top
+).sortedBy { it.first.lowercase(Locale.ROOT) }
 
 fun Pair<String, String>.nameNextToFlagEmoji(): String {
-    // fallback to [A][A] -> [?] question mak flag
     val flag = SubtitleHelper.getFlagFromIso(this.second) ?: "\ud83c\udde6\ud83c\udde6"
-
-    return "$flag\u00a0${this.first}" // \u00a0 non-breaking space
+    return "$flag\u00a0${this.first}"
 }
 
-class SettingsGeneral : BasePreferenceFragmentCompat() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setUpToolbar(R.string.category_general)
-        setPaddingBottom()
-        setToolBarScrollFlags()
-    }
-
+class SettingsGeneral : Fragment(R.layout.fragment_settings_general) {
     data class CustomSite(
-        @JsonProperty("parentJavaClass") // javaClass.simpleName
+        @JsonProperty("parentJavaClass")
         val parentJavaClass: String,
         @JsonProperty("name")
         val name: String,
@@ -103,30 +77,31 @@ class SettingsGeneral : BasePreferenceFragmentCompat() {
                 putString(getString(R.string.download_path_key), uri.toString())
                 putString(getString(R.string.download_path_key_visual), it)
             }
+            view?.findViewById<TextView>(R.id.txt_download_path_desc)?.text = it
         }
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpToolbar(R.string.category_general)
+        setPaddingBottom()
+        setToolBarScrollFlags()
         hideKeyboard()
-        setPreferencesFromResource(R.xml.settings_general, rootKey)
+
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        // language selection disabled
 
         fun getCurrent(): MutableList<CustomSite> {
             return getKey<Array<CustomSite>>(USER_PROVIDER_API)?.toMutableList()
                 ?: mutableListOf()
         }
 
-        getPref(R.string.battery_optimisation_key)?.hideOn(TV or EMULATOR)?.setOnPreferenceClickListener {
-            val ctx = context ?: return@setOnPreferenceClickListener false
-
+        view.findViewById<LinearLayout>(R.id.btn_battery)?.setOnClickListener {
+            val ctx = context ?: return@setOnClickListener
             if (isAppRestricted(ctx)) {
                 ctx.showBatteryOptimizationDialog()
             } else {
                 showToast(R.string.app_unrestricted_toast)
             }
-
-            true
         }
 
         fun showAdd() {
@@ -138,14 +113,9 @@ class SettingsGeneral : BasePreferenceFragmentCompat() {
                 true,
                 {}) { selection ->
                 val provider = providers.getOrNull(selection) ?: return@showDialog
-
-                val binding : AddSiteInputBinding = AddSiteInputBinding.inflate(layoutInflater,null,false)
-
-                val builder =
-                    AlertDialog.Builder(context ?: return@showDialog, R.style.AlertDialogCustom)
-                        .setView(binding.root)
-
-                val dialog = builder.create()
+                val binding = AddSiteInputBinding.inflate(layoutInflater, null, false)
+                val dialog = AlertDialog.Builder(context ?: return@showDialog, R.style.AlertDialogCustom)
+                    .setView(binding.root).create()
                 dialog.show()
 
                 binding.text2.text = provider.name
@@ -158,25 +128,18 @@ class SettingsGeneral : BasePreferenceFragmentCompat() {
                         showToast(R.string.error_invalid_data, Toast.LENGTH_SHORT)
                         return@setOnClickListener
                     }
-
                     val current = getCurrent()
-                    val newSite = CustomSite(provider.javaClass.simpleName, name, url, realLang)
-                    current.add(newSite)
+                    current.add(CustomSite(provider.javaClass.simpleName, name, url, realLang))
                     setKey(USER_PROVIDER_API, current.toTypedArray())
-                    // reload apis
                     MainActivity.afterPluginsLoadedEvent.invoke(false)
-
                     dialog.dismissSafe(activity)
                 }
-                binding.cancelBtt.setOnClickListener {
-                    dialog.dismissSafe(activity)
-                }
+                binding.cancelBtt.setOnClickListener { dialog.dismissSafe(activity) }
             }
         }
 
         fun showDelete() {
             val current = getCurrent()
-
             activity?.showMultiDialog(
                 current.map { it.name },
                 listOf(),
@@ -188,12 +151,9 @@ class SettingsGeneral : BasePreferenceFragmentCompat() {
         }
 
         fun showAddOrDelete() {
-            val binding : AddRemoveSitesBinding = AddRemoveSitesBinding.inflate(layoutInflater,null,false)
-            val builder =
-                AlertDialog.Builder(context ?: return, R.style.AlertDialogCustom)
-                    .setView(binding.root)
-
-            val dialog = builder.create()
+            val binding = AddRemoveSitesBinding.inflate(layoutInflater, null, false)
+            val dialog = AlertDialog.Builder(context ?: return, R.style.AlertDialogCustom)
+                .setView(binding.root).create()
             dialog.show()
 
             binding.addSite.setOnClickListener {
@@ -206,48 +166,85 @@ class SettingsGeneral : BasePreferenceFragmentCompat() {
             }
         }
 
-        getPref(R.string.override_site_key)?.setOnPreferenceClickListener { _ ->
-
+        view.findViewById<LinearLayout>(R.id.btn_add_site)?.setOnClickListener {
             if (getCurrent().isEmpty()) {
                 showAdd()
             } else {
                 showAddOrDelete()
             }
-
-            return@setOnPreferenceClickListener true
         }
 
-        getPref(R.string.dns_key)?.setOnPreferenceClickListener {
-            val prefNames = resources.getStringArray(R.array.dns_pref)
-            val prefValues = resources.getIntArray(R.array.dns_pref_values)
+        val dnsDesc = view.findViewById<TextView>(R.id.txt_dns_desc)
+        val prefNames = resources.getStringArray(R.array.dns_pref)
+        val prefValues = resources.getIntArray(R.array.dns_pref_values)
+        val currentDns = settingsManager.getInt(getString(R.string.dns_pref), 0)
+        val dnsIdx = prefValues.indexOf(currentDns).let { if (it == -1) 0 else it }
+        dnsDesc?.text = prefNames.getOrNull(dnsIdx) ?: "Cloudflare"
 
-            val currentDns =
-                settingsManager.getInt(getString(R.string.dns_pref), 0)
-
-            activity?.showBottomDialog(
-                prefNames.toList(),
-                prefValues.indexOf(currentDns),
-                getString(R.string.dns_pref),
-                true,
-                {}) {
-                settingsManager.edit { putInt(getString(R.string.dns_pref), prefValues[it]) }
+        view.findViewById<LinearLayout>(R.id.btn_dns)?.setOnClickListener {
+            val curDns = settingsManager.getInt(getString(R.string.dns_pref), 0)
+            val idx = prefValues.indexOf(curDns).let { if (it == -1) 0 else it }
+            activity?.showBottomDialog(prefNames.toList(), idx, getString(R.string.dns_pref), true, {}) { selectedIdx ->
+                settingsManager.edit { putInt(getString(R.string.dns_pref), prefValues[selectedIdx]) }
+                dnsDesc?.text = prefNames[selectedIdx]
                 (context ?: CloudStreamApp.context)?.let { ctx -> app.initClient(ctx) }
             }
-            return@setOnPreferenceClickListener true
         }
+
+        val jsdelivrSwitch = view.findViewById<SwitchMaterial>(R.id.switch_jsdelivr)
+        jsdelivrSwitch?.isChecked = getKey(getString(R.string.jsdelivr_proxy_key), false) ?: false
+        jsdelivrSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            setKey(getString(R.string.jsdelivr_proxy_key), isChecked)
+            settingsManager.edit { putBoolean(getString(R.string.jsdelivr_proxy_key), isChecked) }
+        }
+
+        val seekParallel = view.findViewById<SeekBar>(R.id.seek_parallel)
+        val txtParallel = view.findViewById<TextView>(R.id.txt_parallel_val)
+        val seekConcurrent = view.findViewById<SeekBar>(R.id.seek_concurrent)
+        val txtConcurrent = view.findViewById<TextView>(R.id.txt_concurrent_val)
+
+        val parallelVal = settingsManager.getInt(getString(R.string.download_parallel_key), 3)
+        val concurrentVal = settingsManager.getInt(getString(R.string.download_concurrent_key), 3)
+
+        seekParallel?.progress = (parallelVal - 1).coerceIn(0, 9)
+        txtParallel?.text = parallelVal.toString()
+        seekParallel?.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val value = progress + 1
+                txtParallel?.text = value.toString()
+                if (fromUser) settingsManager.edit { putInt(getString(R.string.download_parallel_key), value) }
+                DownloadQueueManager.forceRefreshQueue()
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        seekConcurrent?.progress = (concurrentVal - 1).coerceIn(0, 9)
+        txtConcurrent?.text = concurrentVal.toString()
+        seekConcurrent?.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val value = progress + 1
+                txtConcurrent?.text = value.toString()
+                if (fromUser) settingsManager.edit { putInt(getString(R.string.download_concurrent_key), value) }
+                DownloadQueueManager.forceRefreshQueue()
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        val txtDownloadPath = view.findViewById<TextView>(R.id.txt_download_path_desc)
+        val currentDir = settingsManager.getString(getString(R.string.download_path_key_visual), null)
+                    ?: context?.let { ctx -> DownloadFileManagement.getDefaultDir(ctx)?.filePath() }
+        txtDownloadPath?.text = currentDir ?: "Default"
 
         fun getDownloadDirs(): List<String> {
             return safe {
                 context?.let { ctx ->
                     val defaultDir = DownloadFileManagement.getDefaultDir(ctx)?.filePath()
-
                     val first = listOf(defaultDir)
                     (try {
-                        val currentDir = ctx.getBasePath().let { it.first?.filePath() ?: it.second }
-
-                        (first +
-                                ctx.getExternalFilesDirs("").mapNotNull { it.path } +
-                                currentDir)
+                        val cDir = ctx.getBasePath().let { it.first?.filePath() ?: it.second }
+                        (first + ctx.getExternalFilesDirs("").mapNotNull { it.path } + cDir)
                     } catch (e: Exception) {
                         first
                     }).filterNotNull().distinct()
@@ -255,84 +252,27 @@ class SettingsGeneral : BasePreferenceFragmentCompat() {
             } ?: emptyList()
         }
 
-        settingsManager.edit { putBoolean(getString(R.string.jsdelivr_proxy_key), getKey(getString(R.string.jsdelivr_proxy_key), false) ?: false) }
-        getPref(R.string.jsdelivr_proxy_key)?.setOnPreferenceChangeListener { _, newValue ->
-            setKey(getString(R.string.jsdelivr_proxy_key), newValue)
-            return@setOnPreferenceChangeListener true
-        }
-
-        getPref(R.string.download_parallel_key)?.setOnPreferenceChangeListener { _, _ ->
-            // Notify that the queue logic has been changed
-            DownloadQueueManager.forceRefreshQueue()
-            return@setOnPreferenceChangeListener true
-        }
-
-        getPref(R.string.download_path_key)?.setOnPreferenceClickListener {
+        view.findViewById<LinearLayout>(R.id.btn_download_path)?.setOnClickListener {
             val dirs = getDownloadDirs()
-
-            val currentDir =
-                settingsManager.getString(getString(R.string.download_path_key_visual), null)
+            val curDir = settingsManager.getString(getString(R.string.download_path_key_visual), null)
                     ?: context?.let { ctx -> DownloadFileManagement.getDefaultDir(ctx)?.filePath() }
-
+            
             activity?.showBottomDialog(
                 dirs + listOf(getString(R.string.custom)),
-                dirs.indexOf(currentDir),
+                dirs.indexOf(curDir),
                 getString(R.string.download_path_pref),
                 true,
                 {}) {
-                // Last = custom
                 if (it == dirs.size) {
-                    try {
-                        pathPicker.launch(Uri.EMPTY)
-                    } catch (e: Exception) {
-                        logError(e)
-                    }
+                    try { pathPicker.launch(Uri.EMPTY) } catch (e: Exception) { logError(e) }
                 } else {
-                    // Sets both visual and actual paths.
-                    // key = used path
-                    // visual = visual path
                     settingsManager.edit {
                         putString(getString(R.string.download_path_key), dirs[it])
                         putString(getString(R.string.download_path_key_visual), dirs[it])
                     }
+                    txtDownloadPath?.text = dirs[it]
                 }
             }
-            return@setOnPreferenceClickListener true
-        }
-
-        try {
-            beneneCount =
-                settingsManager.getInt(getString(R.string.benene_count), 0)
-            getPref(R.string.benene_count)?.let { pref ->
-                pref.summary =
-                    if (beneneCount <= 0) getString(R.string.benene_count_text_none) else getString(
-                        R.string.benene_count_text
-                    ).format(
-                        beneneCount
-                    )
-
-                pref.setOnPreferenceClickListener {
-                    try {
-                        beneneCount++
-                        if (beneneCount%20 == 0) {
-                            activity?.navigate(R.id.action_navigation_settings_general_to_easterEggMonkeFragment)
-                        }
-                        settingsManager.edit {
-                            putInt(
-                                getString(R.string.benene_count),
-                                beneneCount
-                            )
-                        }
-                        it.summary = getString(R.string.benene_count_text).format(beneneCount)
-                    } catch (e: Exception) {
-                        logError(e)
-                    }
-
-                    return@setOnPreferenceClickListener true
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 }
