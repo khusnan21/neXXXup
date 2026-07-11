@@ -210,7 +210,7 @@ class JavGuru : MainAPI() {
             val paginationLinks = doc1.select("a.page-numbers, ul.pagination a, div.pagination a, nav.pagination a")
             val pageNums = paginationLinks.mapNotNull { it.text().toIntOrNull() }
             val maxPage = pageNums.maxOrNull() ?: 1
-            val maxPageLimit = minOf(maxPage, 20)
+            val maxPageLimit = maxPage
 
             if (maxPageLimit > 1) {
                 val pages = (2..maxPageLimit).toList().amap { p ->
