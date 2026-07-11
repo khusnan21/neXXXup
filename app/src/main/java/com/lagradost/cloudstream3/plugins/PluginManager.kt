@@ -76,6 +76,11 @@ data class PluginData(
     @JsonProperty("isOnline") val isOnline: Boolean,
     @JsonProperty("filePath") val filePath: String,
     @JsonProperty("version") val version: Int,
+    @JsonProperty("tvTypes") val tvTypes: List<String>? = null,
+    @JsonProperty("language") val language: String? = null,
+    @JsonProperty("authors") val authors: List<String>? = null,
+    @JsonProperty("description") val description: String? = null,
+    @JsonProperty("iconUrl") val iconUrl: String? = null,
 ) {
     fun toSitePlugin(): SitePlugin {
         return SitePlugin(
@@ -85,12 +90,12 @@ data class PluginData(
             1,
             internalName,
             internalName,
-            emptyList(),
-            File(this.filePath).name,
+            authors ?: emptyList(),
+            description ?: File(this.filePath).name,
             null,
-            null,
-            null,
-            null,
+            tvTypes,
+            language,
+            iconUrl,
             File(this.filePath).length()
         )
     }
