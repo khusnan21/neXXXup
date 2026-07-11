@@ -12,6 +12,7 @@ class OneJavProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.NSFW)
 
     override val mainPage = mainPageOf(
+        "" to "Home",
         "new" to "New",
         "popular" to "Popular",
         "tag/FC2" to "FC2",
@@ -25,14 +26,13 @@ class OneJavProvider : MainAPI() {
         request: MainPageRequest
     ): HomePageResponse {
         val data = request.data
-        val cleanData = if (data.endsWith("/") || data.contains("?")) data else "$data/"
         val url = if (page <= 1) {
-            "$mainUrl/$cleanData"
+            if (data.isEmpty()) mainUrl else "$mainUrl/$data"
         } else {
-            if (cleanData.contains("?")) {
-                "$mainUrl/$cleanData&page=$page"
+            if (data.contains("?")) {
+                "$mainUrl/$data&page=$page"
             } else {
-                "$mainUrl/$cleanData?page=$page"
+                if (data.isEmpty()) "$mainUrl/?page=$page" else "$mainUrl/$data?page=$page"
             }
         }
         val document = app.get(url).document
@@ -170,7 +170,7 @@ class OneJavProvider : MainAPI() {
                         source = this.name,
                         name = linkName,
                         url = href,
-                        type = ExtractorLinkType.MAGNET
+                        type = ExtractorLinkType.VIDEO
                     ) {
                         this.quality = Qualities.Unknown.value
                     }
@@ -182,7 +182,7 @@ class OneJavProvider : MainAPI() {
                         source = this.name,
                         name = linkName,
                         url = fixUrl(href),
-                        type = ExtractorLinkType.TORRENT
+                        type = ExtractorLinkType.VIDEO
                     ) {
                         this.quality = Qualities.Unknown.value
                     }
