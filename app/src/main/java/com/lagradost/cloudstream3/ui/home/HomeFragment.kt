@@ -590,9 +590,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 // Remake the adapter if isHorizontalImages changed since we can't easily modify var in SearchAdapter
                 val oldHorizontal = context?.getSpanCount(false) != (context?.getSpanCount(currentCategory.list.isHorizontalImages) ?: 3)
                 // Assuming we just submit list. To be safe we will just replace adapter
+                val recycler = binding?.homeMasterRecycler ?: return
                 concatAdapter?.removeAdapter(gridAdapter ?: return)
                 gridAdapter = com.lagradost.cloudstream3.ui.search.SearchAdapter(
-                    binding?.homeMasterRecycler!!,
+                    recycler,
                     currentCategory.list.isHorizontalImages
                 ) { callback ->
                     com.lagradost.cloudstream3.ui.search.SearchHelper.handleSearchClickCallback(callback)
