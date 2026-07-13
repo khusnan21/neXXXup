@@ -669,7 +669,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(
                 com.lagradost.cloudstream3.ui.search.SearchHelper.handleSearchClickCallback(callback)
             }
             
-            concatAdapter = androidx.recyclerview.widget.ConcatAdapter(homeMasterAdapter, gridAdapter)
+            val config = androidx.recyclerview.widget.ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build()
+            concatAdapter = androidx.recyclerview.widget.ConcatAdapter(config, homeMasterAdapter, gridAdapter)
             homeMasterRecycler.setRecycledViewPool(com.lagradost.cloudstream3.ui.search.SearchAdapter.sharedPool)
             homeMasterRecycler.adapter = concatAdapter
             
